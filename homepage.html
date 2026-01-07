@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Outfit Advisor</title>
+
+  <!-- SDKs -->
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Styles -->
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-6px) scale(1.05);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
+    }
+
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .backdrop-glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    @view-transition { navigation: auto; }
+  </style>
+</head>
+
+<body class="h-full">
+
+  <!-- App Wrapper -->
+  <div id="app-wrapper" class="h-full w-full overflow-auto" 
+       style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+
+    <div class="min-h-screen flex flex-col items-center justify-start px-4 py-12">
+
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <img src="images/logo.png" alt="Smart Outfit Advisor" class="w-32 mb-4 shadow-lg rounded-full mx-auto">
+        <h1 class="text-5xl font-serif font-bold text-white drop-shadow-lg mb-3">Smart Outfit Advisor</h1>
+        <p class="text-xl text-indigo-100 mb-1">Expert color recommendations based on event, season & location</p>
+        <p class="text-sm text-indigo-200">Rule-based inference system for optimal color combinations</p>
+      </header>
+
+      <!-- Menu Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+
+        <!-- Whole Outfit Card -->
+        <a href="pages/wholeoutfit.html" class="card-hover backdrop-glass p-8 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-300 text-white flex flex-col items-center text-center">
+          <div class="w-16 h-16 mb-4 bg-white/30 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <img src="images/whole.png" alt="Whole Outfit" class="w-10 h-10">
+          </div>
+          <h2 class="text-xl font-bold mb-2 font-serif">Whole Outfit Suggestion</h2>
+          <p class="text-sm text-white/90">Get complete outfit recommendations for any occasion.</p>
+        </a>
+
+        <!-- Top Suggestion Card -->
+        <a href="pages/topsoutfit.html" class="card-hover backdrop-glass p-8 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-300 text-white flex flex-col items-center text-center">
+          <div class="w-16 h-16 mb-4 bg-white/30 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <img src="images/top.png" alt="Top" class="w-10 h-10">
+          </div>
+          <h2 class="text-xl font-bold mb-2 font-serif">Top Suggestion</h2>
+          <p class="text-sm text-white/90">Find the perfect top to match your style and event.</p>
+        </a>
+
+        <!-- Bottom Suggestion Card -->
+        <a href="pages/bottomsoutfit.html" class="card-hover backdrop-glass p-8 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-300 text-white flex flex-col items-center text-center">
+          <div class="w-16 h-16 mb-4 bg-white/30 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <img src="images/bottom.png" alt="Bottom" class="w-10 h-10">
+          </div>
+          <h2 class="text-xl font-bold mb-2 font-serif">Bottom Suggestion</h2>
+          <p class="text-sm text-white/90">Discover matching bottoms to complete your outfit.</p>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

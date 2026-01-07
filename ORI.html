@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outfit Color Advisor</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    .input-field {
+      transition: all 0.3s ease;
+    }
+    
+    .input-field:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .color-swatch {
+      transition: transform 0.3s ease;
+    }
+    
+    .color-swatch:hover {
+      transform: scale(1.1);
+    }
+    
+    .recommendation-card {
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .submit-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app-wrapper" class="h-full w-full overflow-auto" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+   <div class="min-h-full py-12 px-4">
+    <div class="max-w-4xl mx-auto"><!-- Header -->
+     <header class="text-center mb-10">
+      <h1 id="app-title" class="text-5xl font-bold mb-3" style="color: #ffffff;">Smart Outfit  Advisor</h1>
+      <p id="app-subtitle" class="text-xl mb-2" style="color: #e0e7ff;">Expert color recommendations based on event, season &amp; location</p>
+      <p class="text-sm" style="color: #c7d2fe;">Rule-based inference system for optimal color combinations</p>
+     </header><!-- Input Form -->
+     <div class="rounded-3xl p-8 shadow-2xl mb-8" style="background-color: #ffffff;">
+      <form id="outfit-form">
+       <div class="mb-6"><label for="event-type" id="event-label" class="block text-lg font-semibold mb-3" style="color: #1e293b;">Event Type</label> 
+       <select id="event-type" required>
+  <option value="">Select an event...</option>
+  <option value="going to class">Going to Class</option>
+  <option value="presentation">Presentation</option>
+  <option value="meeting">Meeting</option>
+  <option value="party">Party</option>
+  <option value="casual outing">Casual Outing</option>
+  <option value="sports day">Sports Day</option>
+  <option value="wedding">Wedding</option>
+  <option value="date">Date</option>
+</select>
+   </div>
+     <div class="mb-6"><label for="event-theme" id="event-theme" class="block text-lg font-semibold mb-3" style="color: #1e293b;">Event Them</label> 
+      <select id="event-theme" required>
+  <option value="">Select theme...</option>
+  <option value="cute">Cute</option>
+  <option value="formal">Formal</option>
+  <option value="sporty">Sporty</option>
+  <option value="academic">Academic</option>
+  <option value="elegant">Elegant</option>
+  <option value="casual">Casual</option>
+</select>
+
+   </div>
+       <div class="mb-6"><label for="weather" id="weather" class="block text-lg font-semibold mb-3" style="color: #1e293b;">Weather</label> 
+       <select id="weather" required>
+  <option value="">Select weather...</option>
+  <option value="Sunny">Sunny</option>
+  <option value="Hot">Hot</option>
+  <option value="Cloudy">Cloudy</option>
+  <option value="Rainy">Rainy</option>
+  <option value="Windy">Windy</option>
+</select>
+  </div>
+       <div class="mb-8"><label for="location" id="location" class="block text-lg font-semibold mb-3" style="color: #1e293b;">Location</label>
+      <select id="location" required>
+  <option value="">Select location...</option>
+  <option value="indoor">Indoor</option>
+  <option value="outdoor">Outdoor</option>
+  <option value="classroom">Classroom</option>
+  <option value="office">Office</option>
+  <option value="hall">Hall</option>
+  <option value="park">Park</option>
+</select>
+  </div>
+   <div class="mb-8"><label for="gender" id="gender" class="block text-lg font-semibold mb-3" style="color: #1e293b;">Gender</label>
+    <select id="gender">
+  <option value="">Select gender...</option>
+  <option value="girl">Girl</option>
+  <option value="boy">Boy</option>
+</select>
+
+  </div>
+
+  <button type="submit" id="submit-btn" class="submit-btn w-full py-4 rounded-xl font-bold text-xl shadow-lg" style="background-color: #6366f1; color: #ffffff;"> Get Color Recommendations </button>
+      </form>
+     </div><!-- Results Section -->
+     <div id="results-section" style="display: none;">
+      <div class="recommendation-card rounded-3xl p-8 shadow-2xl" style="background-color: #ffffff;">
+       <h2 class="text-3xl font-bold mb-6 text-center" style="color: #1e293b;">Your Personalized Color Palette</h2>
+       <div id="reasoning-section" class="mb-8 p-6 rounded-xl" style="background-color: #f1f5f9;">
+        <h3 class="text-xl font-bold mb-3" style="color: #475569;">🧠 Expert Reasoning</h3>
+        <p id="reasoning-text" class="text-base leading-relaxed" style="color: #64748b;"></p>
+       </div>
+       <div class="mb-8">
+        <h3 class="text-2xl font-bold mb-4" style="color: #1e293b;">Recommended Colors</h3>
+        <div id="color-swatches" class="grid grid-cols-2 md:grid-cols-3 gap-4"><!-- Color swatches will be inserted here -->
+        </div>
+       </div>
+       <div class="mb-6">
+        <h3 class="text-2xl font-bold mb-4" style="color: #1e293b;">Color Combinations</h3>
+        <div id="combinations-list" class="space-y-3"><!-- Combinations will be inserted here -->
+        </div>
+       </div>
+       <div>
+        <h3 class="text-2xl font-bold mb-4" style="color: #1e293b;">Styling Tips</h3>
+        <ul id="tips-list" class="space-y-2"><!-- Tips will be inserted here -->
+        </ul>
+       </div><button id="reset-btn" class="submit-btn w-full mt-8 py-3 rounded-xl font-bold text-lg" style="background-color: #8b5cf6; color: #ffffff;"> Try Another Combination </button>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: "#6366f1",
+      surface_color: "#ffffff",
+      text_color: "#1e293b",
+      primary_action_color: "#6366f1",
+      secondary_action_color: "#8b5cf6",
+      font_family: "system-ui",
+      font_size: 16,
+      app_title: "Smart Outfit Color Advisor",
+      app_subtitle: "Expert color recommendations based on event, season & location",
+      event_label: "Event Type",
+      season_label: "Season",
+      location_label: "Location",
+      button_text: "Get Color Recommendations"
+    };
+
+    // Expert Knowledge Base - Rule-based system
+    const knowledgeBase = {
+      
+     
+    }; 
+    // Rule-based inference engine
+    const rules = [
+  {
+    input: {
+      event_theme: "cute",
+      event_type: "party",
+      weather: "Sunny"
+    },
+    output: {
+      preference_top: "Crop top",
+      preference_bottom: "Skirt",
+      color: ["Blush Pink", "Rose Gold", "Mint Green"]
+    }
+  },
+
+  {
+    input: {
+      event_theme: "sporty",
+      event_type: "sports day",
+      weather: "Hot"
+    },
+    output: {
+      preference_top: "Jersey",
+      preference_bottom: "Shorts",
+      color: ["Black", "White", "Gray"]
+    }
+  },
+
+  {
+    input: {
+      event_theme: "formal",
+      event_type: "meeting",
+      location_type: "indoor"
+    },
+    output: {
+      preference_top: "Dress shirt",
+      preference_bottom: "Trousers",
+      color: ["Charcoal Gray", "Midnight Blue", "Black"]
+    }
+  }
+
+  //and go on
+
+];
+
+    // Color name to hex mapping
+    function getColorCode(colorName) {
+      const colorMap = {
+        "Navy Blue": "#001f3f", "Charcoal Gray": "#36454f", "Black": "#000000",
+        "White": "#ffffff", "Light Blue": "#add8e6", "Burgundy": "#800020",
+        "Pastel Pink": "#ffd1dc", "Lavender": "#e6e6fa", "Sage Green": "#9dc183",
+        "Dusty Blue": "#6a8caf", "Gold": "#ffd700", "Champagne": "#f7e7ce",
+        "Ivory": "#fffff0", "Denim Blue": "#1560bd", "Beige": "#f5f5dc",
+        "Olive Green": "#808000", "Gray": "#808080", "Coral": "#ff7f50",
+        "Mustard": "#ffdb58", "Deep Purple": "#301934", "Forest Green": "#228b22",
+        "Rose Gold": "#b76e79", "Blush Pink": "#fe828c", "Cream": "#fffdd0",
+        "Royal Blue": "#4169e1", "Emerald Green": "#50c878", "Ruby Red": "#e0115f",
+        "Silver": "#c0c0c0", "Hot Pink": "#ff69b4", "Dark Gray": "#a9a9a9",
+        "Muted Blue": "#5b7c99", "Khaki": "#c3b091", "Earth Brown": "#654321",
+        "Orange": "#ffa500", "Yellow": "#ffff00", "Mint Green": "#98ff98",
+        "Sky Blue": "#87ceeb", "Turquoise": "#40e0d0", "Aqua": "#00ffff",
+        "Brown": "#a52a2a", "Rust": "#b7410e", "Midnight Blue": "#191970"
+      };
+      return colorMap[colorName] || "#cccccc";
+    }
+
+    //rule match
+    function ruleMatches(user, ruleInput) {
+  for (let key in ruleInput) {
+    if (user[key] !== ruleInput[key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+//forward chaining
+function runExpertSystem(userInput) {
+  const matchedRules = [];
+
+  for (let rule of rules) {
+    if (ruleMatches(userInput, rule.input)) {
+      matchedRules.push(rule.output);
+    }
+  }
+
+  return matchedRules;
+}
+
+
+    // Form submission handler
+    document.getElementById('outfit-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+    const userInput = {
+  event_type: document.getElementById('event-type').value,
+  weather: document.getElementById('weather').value,
+  location_type: document.getElementById('location').value,
+  event_theme: document.getElementById('event-theme').value,
+  gender: document.getElementById('gender').value
+};
+
+
+    const results = runExpertSystem(userInput);
+
+  if (results.length === 0) {
+    showNotification("No matching outfit rule found");
+    return;
+  }
+
+  displayRuleResult(results[0]);
+ });
+function displayRuleResult(result) {
+  document.getElementById('reasoning-text').textContent =
+    "Recommendation generated using rule-based expert system.";
+
+  document.getElementById('color-swatches').innerHTML =
+    result.color.map(c => `
+      <div class="text-center">
+        <div class="w-full h-24 rounded-xl mb-2"
+          style="background:${getColorCode(c)}"></div>
+        <p>${c}</p>
+      </div>
+    `).join('');
+
+  document.getElementById('combinations-list').innerHTML = `
+    <div class="p-4 bg-slate-100 rounded-lg">
+      Top: ${result.preference_top}<br>
+      Bottom: ${result.preference_bottom}
+    </div>
+  `;
+
+  document.getElementById('results-section').style.display = "block";
+}
+
+    /* function displayRecommendation(rec) {
+      // Display reasoning
+      document.getElementById('reasoning-text').textContent = rec.reasoning;
+
+      // Display color swatches
+      const swatchesContainer = document.getElementById('color-swatches');
+      swatchesContainer.innerHTML = rec.colors.map((color, idx) => `
+        <div class="text-center">
+          <div class="color-swatch w-full h-32 rounded-xl shadow-lg mb-2" style="background-color: ${rec.colorCodes[idx]};"></div>
+          <p class="font-semibold text-sm" style="color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color};">${color}</p>
+        </div>
+      `).join('');
+
+      // Display combinations
+      const combinationsContainer = document.getElementById('combinations-list');
+      combinationsContainer.innerHTML = rec.combinations.map(combo => `
+        <div class="p-4 rounded-lg" style="background-color: #f1f5f9;">
+          <p class="font-medium" style="color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color};">✓ ${combo}</p>
+        </div>
+      `).join('');
+
+      // Display tips
+      const tipsContainer = document.getElementById('tips-list');
+      tipsContainer.innerHTML = rec.tips.map(tip => `
+        <li class="flex items-start">
+          <span class="mr-2" style="color: ${window.elementSdk?.config?.primary_action_color || defaultConfig.primary_action_color};">💡</span>
+          <span style="color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color}; font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 0.9}px;">${tip}</span>
+        </li>
+      `).join('');
+    } */
+
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #ef4444;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+      `;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
+    }
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      document.getElementById('outfit-form').reset();
+      document.getElementById('results-section').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    async function onConfigChange(config) {
+      const appWrapper = document.getElementById('app-wrapper');
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      appWrapper.style.background = `linear-gradient(135deg, ${backgroundColor} 0%, ${secondaryColor} 100%)`;
+      
+      const appTitle = document.getElementById('app-title');
+      appTitle.textContent = config.app_title || defaultConfig.app_title;
+      appTitle.style.color = config.surface_color || defaultConfig.surface_color;
+      appTitle.style.fontFamily = `${config.font_family || defaultConfig.font_family}, system-ui, sans-serif`;
+      appTitle.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 2.5}px`;
+      
+      const appSubtitle = document.getElementById('app-subtitle');
+      appSubtitle.textContent = config.app_subtitle || defaultConfig.app_subtitle;
+      appSubtitle.style.fontFamily = `${config.font_family || defaultConfig.font_family}, system-ui, sans-serif`;
+      appSubtitle.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.2}px`;
+      
+      document.getElementById('event-label').textContent = config.event_label || defaultConfig.event_label;
+      document.getElementById('season-label').textContent = config.season_label || defaultConfig.season_label;
+      document.getElementById('location-label').textContent = config.location_label || defaultConfig.location_label;
+      document.getElementById('submit-btn').textContent = config.button_text || defaultConfig.button_text;
+      
+      const labels = document.querySelectorAll('label');
+      labels.forEach(label => {
+        label.style.fontFamily = `${config.font_family || defaultConfig.font_family}, system-ui, sans-serif`;
+        label.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.1}px`;
+      });
+      
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+      submitBtn.style.fontFamily = `${config.font_family || defaultConfig.font_family}, system-ui, sans-serif`;
+      submitBtn.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.2}px`;
+      
+      const resetBtn = document.getElementById('reset-btn');
+      if (resetBtn) {
+        resetBtn.style.backgroundColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+        resetBtn.style.fontFamily = `${config.font_family || defaultConfig.font_family}, system-ui, sans-serif`;
+      }
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['app_title', config.app_title || defaultConfig.app_title],
+          ['app_subtitle', config.app_subtitle || defaultConfig.app_subtitle],
+          ['event_label', config.event_label || defaultConfig.event_label],
+          ['season_label', config.season_label || defaultConfig.season_label],
+          ['location_label', config.location_label || defaultConfig.location_label],
+          ['button_text', config.button_text || defaultConfig.button_text]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b6865351719d04c',t:'MTc2NzE2OTYyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
