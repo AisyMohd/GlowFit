@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outfit  Advisor</title>
+
+  <!-- SDKs -->
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Styles -->
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+
+    .input-field {
+      transition: all 0.3s ease;
+    }
+    .input-field:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .color-swatch {
+      transition: transform 0.3s ease;
+    }
+    .color-swatch:hover {
+      transform: scale(1.1);
+    }
+
+    .recommendation-card {
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .submit-btn {
+      transition: all 0.3s ease;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    @view-transition { navigation: auto; }
+  </style>
+</head>
+
+<body class="h-full">
+
+  <!-- App Wrapper -->
+  <div id="app-wrapper" class="h-full w-full overflow-auto" 
+       style="background: linear-gradient(135deg, #6B5B95 0%, #B8A9C9 100%);">
+    <div class="min-h-full py-12 px-4">
+      <div class="max-w-4xl mx-auto">
+
+        <!-- Header -->
+        <header class="text-center mb-10">
+          <h1 id="app-title" class="text-5xl font-bold mb-3" style="color: #ffffff;">
+            Top Suggestion
+          </h1>
+          <p id="app-subtitle" class="text-xl mb-2" style="color: #e0e7ff;">
+            Expert color recommendations based on event, season & location
+          </p>
+          <p class="text-sm" style="color: #c7d2fe;">
+            Rule-based inference system for optimal color combinations
+          </p>
+        </header>
+
+        <!-- Form -->
+        <div id="form"></div>
+
+        <!-- Results -->
+        <div id="results"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+<script>
+/***********************
+ * CONFIGURATION
+ ***********************/
+const defaultConfig = {
+  // Background & Surfaces
+  background_color: "linear-gradient(135deg, #6B5B95 0%, #B8A9C9 100%)", // soft elegant gradient
+  surface_color: "#ffffff", // cards and forms
+  card_shadow: "0 8px 20px rgba(0,0,0,0.12)", // soft elegant shadow
+  card_border_radius: "1.5rem", // smooth rounded corners
+
+  // Text
+  text_color: "#1F2937", // dark slate for main text
+  secondary_text_color: "#6B7280", // soft gray for labels & hints
+  heading_color: "#111827", // strong elegant headings
+  font_family: "'Lora', serif", // elegant serif font for headings
+  body_font_family: "'Inter', sans-serif", // clean sans-serif for body text
+  font_size: 16,
+  heading_font_size: 24,
+
+  // Actions & Buttons
+  primary_action_color: "#6B5B95", // main button color
+  primary_action_hover: "#57457F",
+  secondary_action_color: "#B8A9C9",
+  secondary_action_hover: "#A48BB8",
+  button_border_radius: "1rem",
+  button_text_color: "#ffffff",
+
+  // App Info
+  app_title: "Smart Outfit Color Advisor",
+  app_subtitle: "Curated color recommendations for every occasion",
+  
+  // Form Labels
+  event_label: "Event Type",
+  season_label: "Season",
+  location_label: "Location",
+  gender_label: "Gender",
+  
+  // Buttons
+  button_text: "Get Recommendations",
+  reset_button_text: "Try Another Combination",
+
+  // Color swatches & outfit images
+  color_swatch_size: "6rem",
+  outfit_image_height: "12rem",
+  outfit_image_border_radius: "1rem",
+};
+
+
+/***********************
+ * RULES
+ ***********************/
+let rules = [];
+
+// Load rules from JSON file
+async function loadRules() {
+  try {
+    const response = await fetch('js/rules.json');
+    rules = await response.json();
+    console.log("Rules loaded:", rules.length);
+  } catch (err) {
+    console.error("Failed to load rules:", err);
+  }
+}
+
+/***********************
+ * COLOR MAP
+ ***********************/
+function getColorCode(colorName) {
+  const colorMap = {
+    "Navy Blue": "#001f3f", "Charcoal Gray": "#36454f", "Black": "#000000",
+    "White": "#ffffff", "Light Blue": "#add8e6", "Burgundy": "#800020",
+    "Pastel Pink": "#ffd1dc", "Lavender": "#e6e6fa", "Sage Green": "#9dc183",
+    "Dusty Blue": "#6a8caf", "Gold": "#ffd700", "Champagne": "#f7e7ce",
+    "Ivory": "#fffff0", "Denim Blue": "#1560bd", "Beige": "#f5f5dc",
+    "Olive Green": "#808000", "Gray": "#808080", "Coral": "#ff7f50",
+    "Mustard": "#ffdb58", "Deep Purple": "#301934", "Forest Green": "#228b22",
+    "Rose Gold": "#b76e79", "Blush Pink": "#fe828c", "Cream": "#fffdd0",
+    "Royal Blue": "#4169e1", "Emerald Green": "#50c878", "Ruby Red": "#e0115f",
+    "Silver": "#c0c0c0", "Hot Pink": "#ff69b4", "Dark Gray": "#a9a9a9",
+    "Muted Blue": "#5b7c99", "Khaki": "#c3b091", "Earth Brown": "#654321",
+    "Orange": "#ffa500", "Yellow": "#ffff00", "Mint Green": "#98ff98",
+    "Sky Blue": "#87ceeb", "Turquoise": "#40e0d0", "Aqua": "#00ffff",
+    "Brown": "#a52a2a", "Rust": "#b7410e", "Midnight Blue": "#191970"
+  };
+  return colorMap[colorName] || "#cccccc";
+}
+
+/***********************
+ * RULE MATCHING
+ ***********************/
+function runExpertSystem(userInput) {
+  let bestRule = null;
+  let highestScore = 0;
+
+  rules.forEach(rule => {
+    let score = 0;
+    let ruleKeys = Object.keys(rule.input);
+
+    ruleKeys.forEach(key => {
+      if (userInput[key] && userInput[key] === rule.input[key]) {
+        score++;
+      }
+    });
+
+    // Rule must match at least 1 condition
+    if (score > highestScore) {
+      highestScore = score;
+      bestRule = rule;
+    }
+  });
+
+  return highestScore > 0 ? bestRule.output : null;
+}
+
+/***********************
+ * LOAD HTML PARTIALS
+ ***********************/
+async function load(id, file) {
+  try {
+    const res = await fetch(file);
+    const html = await res.text();
+    document.getElementById(id).innerHTML = html;
+  } catch (err) {
+    console.error(`Failed to load ${file}:`, err);
+  }
+}
+
+/***********************
+ * FORM HANDLER
+ ***********************/
+function handleFormSubmit(e) {
+  e.preventDefault();
+
+  let userInput = {
+    event_type: document.getElementById('event-type')?.value,
+    weather: document.getElementById('weather')?.value,
+    location_type: document.getElementById('location')?.value,
+    event_theme: document.getElementById('event-theme')?.value,
+    gender: document.getElementById('gender')?.value
+  };
+
+  // Remove empty fields
+  userInput = Object.fromEntries(
+    Object.entries(userInput).filter(([_, v]) => v && v !== "")
+  );
+
+  const result = runExpertSystem(userInput);
+
+  if (!result) {
+    showNotification("No matching outfit rule found");
+    return;
+  }
+
+  displayRuleResult(result);
+}
+
+/***********************
+ * DISPLAY RESULTS
+ ***********************/
+function displayRuleResult(result) {
+  document.getElementById('reasoning-text').textContent =
+    "Recommendation generated using rule-based expert system.";
+
+  document.getElementById('color-swatches').innerHTML =
+    result.color.map(c => `
+      <div class="text-center">
+        <div class="w-full h-24 rounded-xl mb-2" style="background:${getColorCode(c)}"></div>
+        <p>${c}</p>
+      </div>
+    `).join('');
+
+ document.getElementById('combinations-list').innerHTML = `
+  <div class="grid grid-cols-2 gap-4">
+    <div class="text-center">
+      <img src="/images/tops/${result.preference_top.toLowerCase().replace(/\s/g,'_')}.jpg" 
+           alt="${result.preference_top}" 
+            class="w-full max-h-48 object-contain rounded-xl mb-2">
+      <p class="font-semibold">${result.preference_top}</p>
+    </div>
+    <div class="text-center">
+      <img src="/images/bottoms/${result.preference_bottom.toLowerCase().replace(/\s/g,'_')}.jpg" 
+           alt="${result.preference_bottom}" 
+            class="w-full max-h-48 object-contain rounded-xl mb-2">
+      <p class="font-semibold">${result.preference_bottom}</p>
+    </div>
+  </div>
+`;
+
+
+  document.getElementById('results-section').style.display = "block";
+}
+
+/***********************
+ * NOTIFICATION
+ ***********************/
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ef4444;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+  `;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+/***********************
+ * INITIALIZE APP
+ ***********************/
+async function initApp() {
+  await loadRules();
+  await load("form", "parts/formtop.html");
+  await load("results", "parts/result.html");
+
+  const form = document.getElementById('top-form');
+  if (form) {
+    form.addEventListener('submit', handleFormSubmit);
+  } else {
+    console.error("Form not found! Ensure parts/form.html has id='outfit-form'");
+  }
+}
+
+// Start app
+initApp();
+</script>
+
+
+</body>
+</html>
