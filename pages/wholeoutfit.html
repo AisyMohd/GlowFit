@@ -157,22 +157,62 @@ async function loadRules() {
 /***********************
  * COLOR MAP
  ***********************/
+// Color categories
+const colorCategory = {
+  dark: ["Navy Blue","Charcoal Gray","Black","Dark Gray","Midnight Blue"],
+  bright: ["White","Ivory","Beige","Pastel Pink","Mint Green","Sky Blue","Light Blue","Cream"],
+  soft: ["Blush Pink","Lavender","Mint Green","Pastel Pink","Sky Blue"],
+  warm: ["Coral","Peach","Mustard","Orange","Rust"]
+};
+
+// Weather rules for filtering colors
+const weatherColorRules = {
+  Hot: { remove: ["Black","Dark Gray","Midnight Blue"] },
+  Sunny: { keepOnly: ["bright","soft","warm"] },
+  Rainy: { remove: ["White","Pastel Pink"] },
+  Windy: { keepOnly: ["Earth Brown","Olive Green","Khaki","Muted Blue"] },
+  Night: { keepOnly: ["dark","deep"] } // deep = Dark Gray, Midnight Blue, etc.
+};
+
+// Filter colors based on weather
+function filterColorsByWeather(colors, weather) {
+  const rule = weatherColorRules[weather];
+  if (!rule) return colors;
+
+  let filtered = [...colors];
+
+  if (rule.remove) {
+    filtered = filtered.filter(c => !rule.remove.includes(c));
+  }
+
+  if (rule.keepOnly) {
+    filtered = filtered.filter(c => {
+      // keepOnly can be categories or explicit colors
+      return rule.keepOnly.some(cat => colorCategory[cat]?.includes(c) || rule.keepOnly.includes(c));
+    });
+  }
+
+  // fallback if all colors removed
+  return filtered.length ? filtered : colors;
+}
+
+// Map color names to hex codes
 function getColorCode(colorName) {
   const colorMap = {
-    "Navy Blue": "#001f3f", "Charcoal Gray": "#36454f", "Black": "#000000",
-    "White": "#ffffff", "Light Blue": "#add8e6", "Burgundy": "#800020",
-    "Pastel Pink": "#ffd1dc", "Lavender": "#e6e6fa", "Sage Green": "#9dc183",
-    "Dusty Blue": "#6a8caf", "Gold": "#ffd700", "Champagne": "#f7e7ce",
-    "Ivory": "#fffff0", "Denim Blue": "#1560bd", "Beige": "#f5f5dc",
-    "Olive Green": "#808000", "Gray": "#808080", "Coral": "#ff7f50",
-    "Mustard": "#ffdb58", "Deep Purple": "#301934", "Forest Green": "#228b22",
-    "Rose Gold": "#b76e79", "Blush Pink": "#fe828c", "Cream": "#fffdd0",
-    "Royal Blue": "#4169e1", "Emerald Green": "#50c878", "Ruby Red": "#e0115f",
-    "Silver": "#c0c0c0", "Hot Pink": "#ff69b4", "Dark Gray": "#a9a9a9",
-    "Muted Blue": "#5b7c99", "Khaki": "#c3b091", "Earth Brown": "#654321",
-    "Orange": "#ffa500", "Yellow": "#ffff00", "Mint Green": "#98ff98",
-    "Sky Blue": "#87ceeb", "Turquoise": "#40e0d0", "Aqua": "#00ffff",
-    "Brown": "#a52a2a", "Rust": "#b7410e", "Midnight Blue": "#191970"
+    "Navy Blue": "#001f3f","Charcoal Gray": "#36454f","Black": "#000000",
+    "White": "#ffffff","Light Blue": "#add8e6","Burgundy": "#800020",
+    "Pastel Pink": "#ffd1dc","Lavender": "#e6e6fa","Sage Green": "#9dc183",
+    "Dusty Blue": "#6a8caf","Gold": "#ffd700","Champagne": "#f7e7ce",
+    "Ivory": "#fffff0","Denim Blue": "#1560bd","Beige": "#f5f5dc",
+    "Olive Green": "#808000","Gray": "#808080","Coral": "#ff7f50",
+    "Mustard": "#ffdb58","Deep Purple": "#301934","Forest Green": "#228b22",
+    "Rose Gold": "#b76e79","Blush Pink": "#fe828c","Cream": "#fffdd0",
+    "Royal Blue": "#4169e1","Emerald Green": "#50c878","Ruby Red": "#e0115f",
+    "Silver": "#c0c0c0","Hot Pink": "#ff69b4","Dark Gray": "#a9a9a9",
+    "Muted Blue": "#5b7c99","Khaki": "#c3b091","Earth Brown": "#654321",
+    "Orange": "#ffa500","Yellow": "#ffff00","Mint Green": "#98ff98",
+    "Sky Blue": "#87ceeb","Turquoise": "#40e0d0","Aqua": "#00ffff",
+    "Brown": "#a52a2a","Rust": "#b7410e","Midnight Blue": "#191970"
   };
   return colorMap[colorName] || "#cccccc";
 }
@@ -180,28 +220,77 @@ function getColorCode(colorName) {
 /***********************
  * RULE MATCHING
  ***********************/
+ function filterColorsByWeatherAndTheme(colors, theme, weather) {
+    // Base colors per theme
+    const themeColors = {
+        formal: ["Black", "White", "Navy Blue"],
+        casual: ["Light Blue", "White", "Denim Blue"],
+        cute: ["Pastel Pink", "Lavender", "Blush Pink"],
+        sporty: ["Black", "White", "Coral"],
+        elegant: ["Emerald Green", "Deep Purple", "Ruby Red"],
+        academic: ["Navy Blue", "Gray", "White"]
+    };
+
+    let palette = themeColors[theme] || colors;
+
+    // Weather adjustments
+    if (weather === "Hot") {
+        palette = palette.filter(c => !["Black","Dark Gray","Midnight Blue"].includes(c));
+    }
+    if (weather === "Rainy") {
+        // Optional: adjust for rainy weather
+    }
+
+    return palette.length > 0 ? palette : colors;
+}
+
 function runExpertSystem(userInput) {
-  let bestRule = null;
-  let highestScore = 0;
+    let bestRule = null;
+    let highestScore = 0;
 
-  rules.forEach(rule => {
-    let score = 0;
-    let ruleKeys = Object.keys(rule.input);
+    rules.forEach(rule => {
+        let score = 0;
+        const keys = Object.keys(rule.input);
 
-    ruleKeys.forEach(key => {
-      if (userInput[key] && userInput[key] === rule.input[key]) {
-        score++;
-      }
+        keys.forEach(key => {
+            if (userInput[key]) {
+                // Handle array inputs (like gender)
+                if (Array.isArray(rule.input[key])) {
+                    if (rule.input[key].includes(userInput[key])) score += 2;
+                } else if (userInput[key] === rule.input[key]) {
+                    score += 2;
+                }
+            }
+
+            // Optional fields boost score
+            if ((key === "location_type" || key === "event_theme") && userInput[key] === rule.input[key]) {
+                score += 1;
+            }
+        });
+
+        if (score > highestScore) {
+            highestScore = score;
+            bestRule = rule;
+        }
     });
 
-    // Rule must match at least 1 condition
-    if (score > highestScore) {
-      highestScore = score;
-      bestRule = rule;
-    }
-  });
+    if (!bestRule) {
+    showNotification("No Rules Match");
+    return;
+}
 
-  return highestScore > 0 ? bestRule.output : null;
+    // Apply theme + weather color filtering
+    const filteredColors = filterColorsByWeatherAndTheme(
+        bestRule.output.color,
+        userInput.event_theme,
+        userInput.weather
+    );
+
+    return {
+        preference_top: bestRule.output.preference_top || "T-shirt",
+        preference_bottom: bestRule.output.preference_bottom || "Jeans",
+        color: filteredColors
+    };
 }
 
 /***********************
@@ -235,6 +324,12 @@ function handleFormSubmit(e) {
   userInput = Object.fromEntries(
     Object.entries(userInput).filter(([_, v]) => v && v !== "")
   );
+  // Mandatory fields check
+if (!userInput.gender || !userInput.event_type || !userInput.weather) {
+    showNotification("Please provide Gender, Event Type, and Weather.");
+    return;
+}
+
 
   const result = runExpertSystem(userInput);
 
