@@ -1,92 +1,331 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GLOWFIT</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLOWFIT</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
+<style>
+      /* ===============================
+       COLOR VARIABLES (BRAND PALETTE)
+       =============================== */
 
-  <!-- SDKs -->
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  :root {
+    --tamarillo: #9e1814;
+    --burnt-umber: #834625;
+    --guardsman-red: #c4020a;
+    --oil: #251d15;
+    --copper: #be6e3f;
+    --bulgarian-rose: #4d0c08;
+    --cement: #907a65;
+    --shingle-fawn: #765036;
+    --tan: #d1b386;
+    --soft-amber: #d1c5b1;
+    --muddy-waters: #b9885c;
 
-  <!-- TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    --text-dark: #251d15; /* primary dark text */
+    --text-secondary: #907a65; /* secondary text */
+  }
+      /* ===============================
+       GLOBAL PAGE STYLING
+       =============================== */
+  body {
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    margin: 0;
+    background: linear-gradient(135deg, var(--bulgarian-rose) 0%, var(--tamarillo) 50%, var(--copper) 100%);
+  }
+      /* ===============================
+       TYPOGRAPHY STYLES
+       =============================== */
+  .font-main-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dark); }
+  .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
+  .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
+  .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
 
-  <!-- Styles -->
-  <style>
-    body {
-      box-sizing: border-box;
-      font-family: 'Outfit', sans-serif;
-    }
+      /* ===============================
+       BACKGROUND STAR / SPRINKLE EFFECT
+       =============================== */
 
-    .card-hover:hover {
-      transform: translateY(-6px) scale(1.05);
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
-    }
+  #sprinkle-rain { position: fixed; 
+    inset: 0; 
+    z-index: 5;                   /* Behind content but above background */
+    pointer-events: none;         /* Prevent interaction interference */
+    overflow: hidden; }
 
-    .card-hover {
-      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-    }
+  .star {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    animation: twinkle 1.5s infinite alternate;
+    filter: drop-shadow(0 0 3px rgba(255,255,255,0.7));
+    will-change: transform, opacity;
+  }
+    
+  /* Star blinking animation */
+  @keyframes twinkle {
+    from { opacity: 0.4; transform: scale(0.85) rotate(0deg); }
+    to { opacity: 0.9; transform: scale(1.15) rotate(180deg); }
+  }
 
-    .backdrop-glass {
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
+  /* Floating motion to make stars feel organic */
+  @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(10deg); } }
 
-    @view-transition { navigation: auto; }
-  </style>
+      /* ===============================
+       CARD COMPONENT STYLING
+       =============================== */
+
+  .card-hover {
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+    /* Hover interaction for cards */
+  .card-hover:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.90),
+    0 0 20px rgba(210,179,134,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+    border-color: rgba(210,179,134,0.3);
+  }
+
+      /* ===============================
+       IMAGE HANDLING
+       =============================== */
+  .image-container {
+    position: relative;
+    width: 100%;
+    height: 450px; /* increased for full image */
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .card-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+    
+  /* Image swap on hover */
+  .image-hover { opacity: 0; transform: scale(1.1); }
+  .card-hover:hover .image-default { opacity: 0; transform: scale(1.05); }
+  .card-hover:hover .image-hover { opacity: 1; transform: scale(1); }
+
+  .gradient-border { position: relative; }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(45deg, var(--tan), var(--copper), var(--tamarillo));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .card-hover:hover.gradient-border::before { opacity: 1; }
+
+      /* ===============================
+       DECORATIVE & ANIMATION EFFECTS
+       =============================== */
+
+  .fade-in { animation: fadeIn 0.8s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .stagger-delay-1 { animation-delay: 0.1s; }
+  .stagger-delay-2 { animation-delay: 0.2s; }
+  .stagger-delay-3 { animation-delay: 0.3s; }
+
+  .glow-text {   /* Glow effect for brand title */
+    text-shadow: 
+    0 0 15px rgba(209, 179, 134, 0.6),
+    0 0 30px rgba(190, 110, 63, 0.45),
+    0 0 50px rgba(158, 24, 20, 0.25);
+  }
+
+  .logo-glow { filter: drop-shadow(0 0 10px rgba(210,179,134,0.5)) drop-shadow(0 0 20px rgba(190,110,63,0.3)); }
+    
+  /* Subtle background pattern for depth */
+  .bg-pattern {
+    background-image: radial-gradient(circle at 20% 80%, rgba(210,179,134,0.05) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(190,110,63,0.05) 0%, transparent 50%),
+                      radial-gradient(circle at 40% 40%, rgba(157,24,20,0.03) 0%, transparent 50%);
+  }
+</style>
 </head>
+<body class="h-full bg-pattern">
 
-<body class="h-full">
+    <!-- ===============================
+     STAR / SPRINKLE RAIN CONTAINER
+     =============================== -->
+<div id="sprinkle-rain"></div>
 
-  <!-- App Wrapper -->
-  <div id="app-wrapper" class="h-full w-full overflow-auto" 
-       style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+    <!-- ===============================
+     MAIN APPLICATION WRAPPER
+     =============================== -->
+<div id="app-wrapper" class="relative min-h-screen">
+  <div class="relative z-20 flex flex-col items-center px-4 py-12 md:py-16">
 
-    <div class="min-h-screen flex flex-col items-center justify-start px-4 py-12">
-
-      <!-- Header -->
-      <header class="text-center mb-12">
-        <img src="images/logo glowfit.png" alt="Smart Outfit Advisor" class="w-32 mb-4 shadow-lg rounded-full mx-auto">
-        <h1 class="text-5xl font-serif font-bold text-white drop-shadow-lg mb-3">GLOWFIT</h1>
-        <p class="text-xl text-indigo-100 mb-1">Expert color recommendations based on event, season & location</p>
-        <p class="text-sm text-indigo-200">Rule-based inference system for optimal color combinations</p>
-      </header>
-
-      <!-- Menu Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
-
-        <!-- Whole Outfit Card -->
-        <a href="pages/wholeoutfit.html" class="card-hover backdrop-glass p-8 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-300 text-white flex flex-col items-center text-center">
-          <div class="w-16 h-16 mb-4 bg-white/30 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-            <img src="images/wholeoutfit.jpg" alt="Whole Outfit" class="w-10 h-10">
-          </div>
-          <h2 class="text-xl font-bold mb-2 font-serif">Whole Outfit Suggestion</h2>
-          <p class="text-sm text-white/90">Get complete outfit recommendations for any occasion.</p>
-        </a>
-
-        <!-- Top Suggestion Card -->
-        <a href="pages/topsoutfit.html" class="card-hover backdrop-glass p-8 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-300 text-white flex flex-col items-center text-center">
-          <div class="w-16 h-16 mb-4 bg-white/30 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-            <img src="images/top.jpg" alt="Top" class="w-10 h-10">
-          </div>
-          <h2 class="text-xl font-bold mb-2 font-serif">Top Suggestion</h2>
-          <p class="text-sm text-white/90">Find the perfect top to match your style and event.</p>
-        </a>
-
-        <!-- Bottom Suggestion Card -->
-        <a href="pages/bottomsoutfit.html" class="card-hover backdrop-glass p-8 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-300 text-white flex flex-col items-center text-center">
-          <div class="w-16 h-16 mb-4 bg-white/30 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-            <img src="/images/bottom.jpg" alt="Bottom" class="w-10 h-10">
-          </div>
-          <h2 class="text-xl font-bold mb-2 font-serif">Bottom Suggestion</h2>
-          <p class="text-sm text-white/90">Discover matching bottoms to complete your outfit.</p>
-        </a>
-
+    <!-- Header Section -->
+    <header class="text-center mb-16 fade-in">
+      <img src="images/logo glowfit.png" class="w-36 mb-6 rounded-full mx-auto logo-glow transform transition-transform duration-300 hover:scale-110">
+      <h1 class="text-5xl md:text-6xl font-main-title mb-4 glow-text">GLOWFIT</h1>
+      <div class="max-w-2xl mx-auto">
+        <p class="text-xl md:text-2xl font-tagline mb-2">
+Intelligent outfit recommendations        </p>
+        <p class="text-sm md:text-base font-tagline font-normal">
+Where color meets personal style        </p>
       </div>
+    </header>
+
+    <!-- Cards Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full fade-in">
+      
+      <!-- Whole Outfit Card -->
+      <a href="pages/wholeoutfit.html" class="card-hover gradient-border rounded-2xl overflow-hidden fade-in stagger-delay-1 flex flex-col min-h-[600px]">
+        <div class="image-container">
+          <img src="images/wholeoutfit.jpg" class="card-image image-default">
+          <img src="images/wholeoutfit model.jpg" class="card-image image-hover">
+          <div class="absolute top-3 left-3 bg-gradient-to-r from-[#9e1814] to-[#be6e3f] text-white px-3 py-1 rounded-full text-xs font-medium">Complete Look</div>
+        </div>
+        <div class="p-6 flex-1 flex flex-col">
+          <h2 class="text-3xl font-card-title mb-3">Whole Outfit</h2>
+          <p class="font-card-desc mb-4 flex-1">
+            Complete outfit suggestion tailored to your event, season, and location with harmonious color combinations.
+          </p>
+          <div class="pt-4 border-t border-white/10">
+            <span class="text-base font-medium text-[#251d15]">Recommended →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Top Suggestion Card -->
+      <a href="pages/topsoutfit.html" class="card-hover gradient-border rounded-2xl overflow-hidden fade-in stagger-delay-2 flex flex-col min-h-[600px]">
+        <div class="image-container">
+          <img src="images/top.jpg" class="card-image image-default">
+          <img src="images/top model.jpg" class="card-image image-hover">
+          <div class="absolute top-3 left-3 bg-gradient-to-r from-[#834625] to-[#b9885c] text-white px-3 py-1 rounded-full text-xs font-medium">Perfect Match</div>
+        </div>
+        <div class="p-6 flex-1 flex flex-col">
+          <h2 class="text-3xl font-card-title mb-3">Top</h2>
+          <p class="font-card-desc mb-4 flex-1">
+            Perfect top suggestion based on color theory and occasion requirements.
+          </p>
+          <div class="pt-4 border-t border-white/10">
+            <span class="text-base font-medium text-[#251d15]">Discover →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Bottom Suggestion Card -->
+      <a href="pages/bottomsoutfit.html" class="card-hover gradient-border rounded-2xl overflow-hidden fade-in stagger-delay-3 flex flex-col min-h-[600px]">
+        <div class="image-container">
+          <img src="images/bottom.jpg" class="card-image image-default">
+          <img src="images/bottom model.jpg" class="card-image image-hover">
+          <div class="absolute top-3 left-3 bg-gradient-to-r from-[#251d15] to-[#907a65] text-white px-3 py-1 rounded-full text-xs font-medium">Harmonious</div>
+        </div>
+        <div class="p-6 flex-1 flex flex-col">
+          <h2 class="text-3xl font-card-title mb-3">Bottom</h2>
+          <p class="font-card-desc mb-4 flex-1">
+            Matching bottoms to complement your top selection with balanced proportions and colors.
+          </p>
+          <div class="pt-4 border-t border-white/10">
+            <span class="text-base font-medium text-[#251d15]">Explore →</span>
+          </div>
+        </div>
+      </a>
+
     </div>
   </div>
+</div>
+
+    <!-- ===============================
+     STAR RAIN JAVASCRIPT LOGIC
+     =============================== -->
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  /* Container that holds all falling stars */
+  const container = document.getElementById('sprinkle-rain');
+  
+  /* Color and shape variations for visual diversity */
+  const colors = ['#FFFFFF','#d1c5b1','#d1b386','#be6e3f','#b9885c'];
+  const shapes = ['✦','✧','★','✶','✴','✷'];
+  
+  /* Track active stars for cleanup */
+  const activeStars = [];
+
+    /* ===============================
+     FUNCTION: CREATE A SINGLE STAR
+     =============================== */
+  function createStar() {
+    const star = document.createElement('div');
+    star.className = 'star';
+
+    /* Randomized visual properties */
+    const size = Math.random() * 14 + 10;
+    const left = Math.random() * window.innerWidth;
+    const duration = Math.random() * 3000 + 2000;
+    const delay = Math.random() * 1000;
+    const shape = shapes[Math.floor(Math.random()*shapes.length)];
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const floatSpeed = Math.random() * 2 + 1;
+    const baseOpacity = Math.random() * 0.4 + 0.3;
+
+    /* Apply star styles */
+    star.innerHTML = shape;
+    star.style.fontSize = size+'px';
+    star.style.left = left+'px';
+    star.style.top = '-30px';
+    star.style.color = color;
+    star.style.opacity = baseOpacity;
+    star.style.animation = `twinkle ${duration}ms infinite alternate, float ${floatSpeed}s infinite ease-in-out`;
+    star.style.animationDelay = `${delay}ms`;
+
+    container.appendChild(star);
+    activeStars.push({el: star, baseOpacity});
+
+       /* ===============================
+       FALLING ANIMATION (MANUAL)
+       =============================== */
+    const startTime = Date.now();
+    const fallDuration = Math.random() * 5000 + 8000;
+    const startY = -30;
+    const endY = window.innerHeight + 30;
+
+    function animateFall() {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / fallDuration, 1);
+      const currentY = startY + progress * (endY - startY);
+      star.style.top = currentY + 'px';
+      
+      if (progress > 0.8) star.style.opacity = baseOpacity * (1 - (progress - 0.8)*5);
+      if (progress < 1) requestAnimationFrame(animateFall);
+      else {
+        const index = activeStars.findIndex(s => s.el === star);
+        if(index > -1) activeStars.splice(index,1);
+        star.remove();
+      }
+    }
+
+    requestAnimationFrame(animateFall);
+  }
+
+  for(let i=0;i<20;i++) setTimeout(()=>createStar(),i*100);
+  const interval = setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
+  window.addEventListener('beforeunload',()=>{clearInterval(interval); activeStars.forEach(s=>s.el.remove());});
+});
+</script>
 
 </body>
 </html>
