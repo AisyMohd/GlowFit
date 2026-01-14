@@ -325,26 +325,55 @@ function filterColorsByWeather(colors, weather) {
   return filtered.length ? filtered : colors;
 }
 
-// Map color names to hex codes
 function getColorCode(colorName) {
   const colorMap = {
-    "Navy Blue": "#001f3f","Charcoal Gray": "#36454f","Black": "#000000",
-    "White": "#ffffff","Light Blue": "#add8e6","Burgundy": "#800020",
-    "Pastel Pink": "#ffd1dc","Lavender": "#e6e6fa","Sage Green": "#9dc183",
-    "Dusty Blue": "#6a8caf","Gold": "#ffd700","Champagne": "#f7e7ce",
-    "Ivory": "#fffff0","Denim Blue": "#1560bd","Beige": "#f5f5dc",
-    "Olive Green": "#808000","Gray": "#808080","Coral": "#ff7f50",
-    "Mustard": "#ffdb58","Deep Purple": "#301934","Forest Green": "#228b22",
-    "Rose Gold": "#b76e79","Blush Pink": "#fe828c","Cream": "#fffdd0",
-    "Royal Blue": "#4169e1","Emerald Green": "#50c878","Ruby Red": "#e0115f",
-    "Silver": "#c0c0c0","Hot Pink": "#ff69b4","Dark Gray": "#a9a9a9",
-    "Muted Blue": "#5b7c99","Khaki": "#c3b091","Earth Brown": "#654321",
-    "Orange": "#ffa500","Yellow": "#ffff00","Mint Green": "#98ff98",
-    "Sky Blue": "#87ceeb","Turquoise": "#40e0d0","Aqua": "#00ffff",
-    "Brown": "#a52a2a","Rust": "#b7410e","Midnight Blue": "#191970"
+    "Peach": "#ffd1b3",
+    "Navy Blue": "#001f3f",
+    "Charcoal Gray": "#36454f",
+    "Black": "#000000",
+    "White": "#ffffff",
+    "Light Blue": "#add8e6",
+    "Burgundy": "#800020",
+    "Pastel Pink": "#ffd1dc",
+    "Lavender": "#e6e6fa",
+    "Sage Green": "#9dc183",
+    "Dusty Blue": "#6a8caf",
+    "Gold": "#ffd700",
+    "Champagne": "#f7e7ce",
+    "Ivory": "#fffff0",
+    "Denim Blue": "#1560bd",
+    "Beige": "#f5f5dc",
+    "Olive Green": "#808000",
+    "Gray": "#808080",
+    "Coral": "#ff7f50",
+    "Mustard": "#ffdb58",
+    "Deep Purple": "#301934",
+    "Forest Green": "#228b22",
+    "Rose Gold": "#b76e79",
+    "Blush Pink": "#fe828c",
+    "Cream": "#fffdd0",
+    "Royal Blue": "#4169e1",
+    "Emerald Green": "#50c878",
+    "Ruby Red": "#e0115f",
+    "Silver": "#c0c0c0",
+    "Hot Pink": "#ff69b4",
+    "Dark Gray": "#a9a9a9",
+    "Muted Blue": "#5b7c99",
+    "Khaki": "#c3b091",
+    "Earth Brown": "#654321",
+    "Orange": "#ffa500",
+    "Yellow": "#ffff00",
+    "Mint Green": "#98ff98",
+    "Sky Blue": "#87ceeb",
+    "Turquoise": "#40e0d0",
+    "Aqua": "#00ffff",
+    "Brown": "#a52a2a",
+    "Rust": "#b7410e",
+    "Midnight Blue": "#191970"
   };
   return colorMap[colorName] || "#cccccc";
 }
+
 
 /***********************
  * RULE MATCHING
@@ -372,54 +401,55 @@ function getColorCode(colorName) {
 
     return palette.length > 0 ? palette : colors;
 }
-
-function runExpertSystem(userInput) {
-    let bestRule = null;
-    let highestScore = 0;
-
-    rules.forEach(rule => {
-        let score = 0;
-        const keys = Object.keys(rule.input);
-
-        keys.forEach(key => {
-            if (userInput[key]) {
-                // Handle array inputs (like gender)
-                if (Array.isArray(rule.input[key])) {
-                    if (rule.input[key].includes(userInput[key])) score += 2;
-                } else if (userInput[key] === rule.input[key]) {
-                    score += 2;
-                }
-            }
-
-            // Optional fields boost score
-            if ((key === "location_type" || key === "event_theme") && userInput[key] === rule.input[key]) {
-                score += 1;
-            }
-        });
-
-        if (score > highestScore) {
-            highestScore = score;
-            bestRule = rule;
-        }
-    });
-
-    if (!bestRule) {
-    showNotification("No Rules Match");
-    return;
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
 }
+function runExpertSystem(userInput) {
+  // Step 1: Filter rules by mandatory fields
+  let matchedRules = rules.filter(rule =>
+    rule.gender === userInput.gender &&
+    rule.event_type === userInput.event_type &&
+    rule.weather === userInput.weather
+  );
 
-    // Apply theme + weather color filtering
-    const filteredColors = filterColorsByWeatherAndTheme(
-        bestRule.output.color,
-        userInput.event_theme,
-        userInput.weather
-    );
+  if (!matchedRules.length) return null;
 
-    return {
-        preference_top: bestRule.output.preference_top || "T-shirt",
-        preference_bottom: bestRule.output.preference_bottom || "Jeans",
-        color: filteredColors
-    };
+  // Step 2: Adjust top/bottom options based on location
+  let tops = [];
+  let bottoms = [];
+  matchedRules.forEach(rule => {
+    if (userInput.location_type) {
+      if (["indoor","office","classroom","hall"].includes(userInput.location_type.toLowerCase())) {
+        tops.push(...rule.top_options.filter(t => !["T-shirt","Crop top"].includes(t))); // prefer formal
+        bottoms.push(...rule.bottom_options.filter(b => !["Jeans","Palazzo"].includes(b)));
+      } else if (["outdoor","park"].includes(userInput.location_type.toLowerCase())) {
+        tops.push(...rule.top_options);
+        bottoms.push(...rule.bottom_options);
+      }
+    } else {
+      tops.push(...rule.top_options);
+      bottoms.push(...rule.bottom_options);
+    }
+  });
+
+  tops = shuffle([...new Set(tops)]).slice(0,2);
+  bottoms = shuffle([...new Set(bottoms)]).slice(0,2);
+
+  // Step 3: Filter colors based on weather + theme
+  let colors = [];
+  matchedRules.forEach(rule => {
+    colors.push(...rule.color);
+  });
+
+  colors = [...new Set(colors)]; // remove duplicates
+
+  if (userInput.event_theme) {
+    colors = filterColorsByWeatherAndTheme(colors, userInput.event_theme, userInput.weather);
+  } else {
+    colors = filterColorsByWeather(colors, userInput.weather);
+  }
+
+  return { tops, bottoms, color: shuffle(colors).slice(0,4) };
 }
 
 /***********************
@@ -497,34 +527,53 @@ if (!userInput.gender || !userInput.event_type || !userInput.weather) {
  * DISPLAY RESULTS
  ***********************/
 function displayRuleResult(result) {
-  document.getElementById('reasoning-text').textContent =
-    "Recommendation generated using rule-based expert system.";
-
   document.getElementById('color-swatches').innerHTML =
-    result.color.map(c => `
-      <div class="text-center">
-        <div class="w-full h-24 rounded-xl mb-2" style="background:${getColorCode(c)}"></div>
-        <p>${c}</p>
+  result.color.slice(0, 4).map(c => `
+    <div class="text-center">
+      <div 
+        class="w-full h-20 rounded-xl mb-2 border border-gray-400"
+        style="background:${getColorCode(c)}">
       </div>
-    `).join('');
+      <p class="text-sm">${c}</p>
+    </div>
+  `).join('');
 
- document.getElementById('combinations-list').innerHTML = `
-  <div class="grid grid-cols-2 gap-4">
-    <div class="text-center">
-      <img src="/images/tops/${result.preference_top.toLowerCase().replace(/\s/g,'_')}.jpg" 
-           alt="${result.preference_top}" 
-            class="w-full max-h-48 object-contain rounded-xl mb-2">
-      <p class="font-semibold">${result.preference_top}</p>
+
+document.getElementById('combinations-list').innerHTML = `
+  <div class="space-y-6">
+
+    <!-- TOPS -->
+    <div>
+      <h4 class="font-semibold text-center mb-3">Top Wear</h4>
+      <div class="grid grid-cols-2 gap-4">
+        ${result.tops.map(top => `
+          <div class="text-center">
+            <img 
+              src="/images/tops/${top.toLowerCase().replace(/\s/g,'_')}.jpg"
+              class="w-full max-h-40 object-contain rounded-xl mb-2">
+            <p class="text-sm font-medium">${top}</p>
+          </div>
+        `).join('')}
+      </div>
     </div>
-    <div class="text-center">
-      <img src="/images/bottoms/${result.preference_bottom.toLowerCase().replace(/\s/g,'_')}.jpg" 
-           alt="${result.preference_bottom}" 
-            class="w-full max-h-48 object-contain rounded-xl mb-2">
-      <p class="font-semibold">${result.preference_bottom}</p>
+
+    <!-- BOTTOMS -->
+    <div>
+      <h4 class="font-semibold text-center mb-3">Bottom Wear</h4>
+      <div class="grid grid-cols-2 gap-4">
+        ${result.bottoms.map(bottom => `
+          <div class="text-center">
+            <img 
+              src="/images/bottoms/${bottom.toLowerCase().replace(/\s/g,'_')}.jpg"
+              class="w-full max-h-40 object-contain rounded-xl mb-2">
+            <p class="text-sm font-medium">${bottom}</p>
+          </div>
+        `).join('')}
+      </div>
     </div>
+
   </div>
 `;
-
 
   document.getElementById('results-section').style.display = "block";
 }

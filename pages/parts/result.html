@@ -1,54 +1,57 @@
 <style>
+/* Result Card */
 .recommendation-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
-  border-radius: 1.5rem; /* rounded-3xl */
+  border-radius: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-
-  /* Smooth layered shadow */
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0,0,0,0.12),
     0 10px 20px rgba(0,0,0,0.08);
-
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* keeps button at bottom */
-  min-height: 100%;               /* fills right-container */
+  min-height: 100%;
+}
+
+/* Color swatches */
+.color-swatch {
+  height: 56px;
+  border-radius: 0.75rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+/* Outfit card */
+.outfit-card {
+  background: #f9fafb;
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(0,0,0,0.08);
 }
 </style>
 
-<div id="results-section" class="hidden">
-  <div class="recommendation-card flex flex-col">
-    
-    <!-- Header -->
-    <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">
-      Your Personalized Color Palette
+<div id="results-section">
+  <div class="recommendation-card">
+
+    <h2 class="text-3xl font-bold mb-6 text-center">
+      Your Personalized Outfit
     </h2>
 
-    <!-- Reasoning -->
-    <p id="reasoning-text" class="mb-6 text-center text-slate-700"></p>
-
-    <!-- Scrollable main content -->
-    <div class="flex-1 flex flex-col md:flex-row gap-6 overflow-y-auto">
-      <!-- Recommended Colors -->
+    <div class="flex gap-8">
       <div class="flex-1">
-        <h3 class="text-xl font-bold mb-3 text-gray-700">Recommended Colors</h3>
-        <div id="color-swatches" class="grid grid-cols-2 gap-3 justify-center"></div>
+        <h3 class="text-xl font-bold mb-4 text-center">
+          Recommended Colors
+        </h3>
+        <div id="color-swatches" class="grid grid-cols-2 gap-4"></div>
       </div>
 
-      <!-- Outfit Combinations -->
       <div class="flex-1">
-        <h3 class="text-xl font-bold mb-3 text-gray-700">Outfit Combinations</h3>
-        <div id="combinations-list" class="grid grid-cols-1 gap-3"></div>
+        <h3 class="text-xl font-bold mb-4 text-center">
+          Outfit Combinations
+        </h3>
+        <div id="combinations-list"></div>
       </div>
-    </div>
-
-    <!-- Button at bottom -->
-    <div class="mt-6 flex justify-center">
-      <button id="reset-btn" class="submit-btn w-64 py-3 rounded-xl font-bold text-lg">
-        Try Another Combination
-      </button>
     </div>
 
   </div>
