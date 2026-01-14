@@ -1,3 +1,4 @@
+
 <style>
 /* Result Card */
 .recommendation-card {
@@ -29,30 +30,31 @@
   padding: 1rem;
   border: 1px solid rgba(0,0,0,0.08);
 }
+
+/* ===============================
+       TYPOGRAPHY STYLES
+       =============================== */
+      .font-main-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dark); }
+      .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
+      .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
+      .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
+
 </style>
 
 <div id="results-section">
-  <div class="recommendation-card">
-
-    <h2 class="text-3xl font-bold mb-6 text-center">
-      Your Personalized Outfit
-    </h2>
-
     <div class="flex gap-8">
       <div class="flex-1">
-        <h3 class="text-xl font-bold mb-4 text-center">
+        <h3 class=" font-card-title text-xl mb-4 text-center">
           Recommended Colors
         </h3>
         <div id="color-swatches" class="grid grid-cols-2 gap-4"></div>
       </div>
 
       <div class="flex-1">
-        <h3 class="text-xl font-bold mb-4 text-center">
+        <h3 class="font-card-title text-xl mb-4 text-center">
           Outfit Combinations
         </h3>
         <div id="combinations-list"></div>
       </div>
     </div>
-
-  </div>
 </div>
