@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Outfit Advisor</title>
-
-  <!-- SDKs -->
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLOWFIT</title>
+<link rel="icon" type="image/png" href="/images/logo glowfit.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
+<style>
     :root {
       --tamarillo: #9e1814;
     --burnt-umber: #834625;
@@ -163,7 +158,7 @@
 
       <!-- LEFT: FORM -->
       <section class="w-full md:w-2/5 p-10 flex flex-col justify-center">
-        <div id="form" class="space-y-4 w-full max-w-xs mt-8 mb-8"></div>
+        <div id="form-container" class="space-y-4 w-full max-w-xs mt-8 mb-8"></div>
       </section>
 
       <!-- DIVIDER -->
@@ -177,7 +172,7 @@
         </h2>
 
         <!-- RESULTS -->
-        <div id="results" class="flex-1 overflow-y-auto hidden opacity-0 transition-opacity duration-500">
+        <div id="result-container" class="flex-1 overflow-y-auto hidden opacity-0 transition-opacity duration-500">
           <div id="color-swatches" class="grid grid-cols-2 gap-4 mb-6"></div>
           <div id="combinations-list"></div>
         </div>
@@ -187,6 +182,11 @@
 
 
 </div>
+<!-- DEV DEBUG PANEL (VISIBLE FOR NOW) -->
+<div id="debug-panel"
+     class="mt-4 p-4 rounded-xl bg-black/70 text-green-200 text-xs font-mono max-h-64 overflow-y-auto">
+</div>
+
 
 </div>
 
@@ -201,260 +201,223 @@
   <!-- Scripts -->
 <script>
 /***********************
- * CONFIGURATION
+ * HELPER: LOAD HTML PARTS
  ***********************/
-const defaultConfig = {
-  // Background & Surfaces
-  background_color: "linear-gradient(135deg, #6B5B95 0%, #B8A9C9 100%)", // soft elegant gradient
-  surface_color: "#ffffff", // cards and forms
-  card_shadow: "0 8px 20px rgba(0,0,0,0.12)", // soft elegant shadow
-  card_border_radius: "1.5rem", // smooth rounded corners
-
-  // Text
-  text_color: "#1F2937", // dark slate for main text
-  secondary_text_color: "#6B7280", // soft gray for labels & hints
-  heading_color: "#111827", // strong elegant headings
-  font_family: "'Lora', serif", // elegant serif font for headings
-  body_font_family: "'Inter', sans-serif", // clean sans-serif for body text
-  font_size: 16,
-  heading_font_size: 24,
-
-  // Actions & Buttons
-  primary_action_color: "#6B5B95", // main button color
-  primary_action_hover: "#57457F",
-  secondary_action_color: "#B8A9C9",
-  secondary_action_hover: "#A48BB8",
-  button_border_radius: "1rem",
-  button_text_color: "#ffffff",
-
-  // App Info
-  app_title: "Smart Outfit Color Advisor",
-  app_subtitle: "Curated color recommendations for every occasion",
-  
-  // Form Labels
-  event_label: "Event Type",
-  season_label: "Season",
-  location_label: "Location",
-  gender_label: "Gender",
-  
-  // Buttons
-  button_text: "Get Recommendations",
-  reset_button_text: "Try Another Combination",
-
-  // Color swatches & outfit images
-  color_swatch_size: "6rem",
-  outfit_image_height: "12rem",
-  outfit_image_border_radius: "1rem",
-};
-
-
-/***********************
- * RULES
- ***********************/
-let rules = [];
-
-// Load rules from JSON file
-async function loadRules() {
+async function loadHTML(url, containerId){
   try {
-    const response = await fetch('js/rules.json');
-    rules = await response.json();
-    console.log("Rules loaded:", rules.length);
-  } catch (err) {
-    console.error("Failed to load rules:", err);
+    const res = await fetch(url);
+    const html = await res.text();
+    const container = document.getElementById(containerId);
+    if(container){
+      container.innerHTML = html;
+      return container;
+    }
+    return null;
+  } catch(err){
+    console.error(`Failed to load ${url}:`, err);
+    return null;
   }
 }
+
+/***********************
+ * GLOBAL VARIABLES
+ ***********************/
+let allTops = ["T-Shirt","Crop Top","Blouse","Shirt"];
+let allBottoms = ["Jeans","Palazzo Pants","Skirt","Shorts"];
+let allColors = ["Black","White","Pastel Pink","Lavender","Light Blue","Navy Blue","Gray","Emerald Green","Deep Purple","Ruby Red","Coral","Denim Blue","Blush Pink"];
+
+let filteredTops = [];
+let filteredBottoms = [];
+let filteredColors = [];
 
 /***********************
  * COLOR MAP
  ***********************/
-// Color categories
-const colorCategory = {
-  dark: ["Navy Blue","Charcoal Gray","Black","Dark Gray","Midnight Blue"],
-  bright: ["White","Ivory","Beige","Pastel Pink","Mint Green","Sky Blue","Light Blue","Cream"],
-  soft: ["Blush Pink","Lavender","Mint Green","Pastel Pink","Sky Blue"],
-  warm: ["Coral","Peach","Mustard","Orange","Rust"]
-};
-
-// Weather rules for filtering colors
-const weatherColorRules = {
-  Hot: { remove: ["Black","Dark Gray","Midnight Blue"] },
-  Sunny: { keepOnly: ["bright","soft","warm"] },
-  Rainy: { remove: ["White","Pastel Pink"] },
-  Windy: { keepOnly: ["Earth Brown","Olive Green","Khaki","Muted Blue"] },
-  Night: { keepOnly: ["dark","deep"] } // deep = Dark Gray, Midnight Blue, etc.
-};
-
-// Filter colors based on weather
-function filterColorsByWeather(colors, weather) {
-  const rule = weatherColorRules[weather];
-  if (!rule) return colors;
-
-  let filtered = [...colors];
-
-  if (rule.remove) {
-    filtered = filtered.filter(c => !rule.remove.includes(c));
-  }
-
-  if (rule.keepOnly) {
-    filtered = filtered.filter(c => {
-      // keepOnly can be categories or explicit colors
-      return rule.keepOnly.some(cat => colorCategory[cat]?.includes(c) || rule.keepOnly.includes(c));
-    });
-  }
-
-  // fallback if all colors removed
-  return filtered.length ? filtered : colors;
+function getColorCode(name){
+  const colorMap = {
+    "Black":"#000000",
+    "White":"#ffffff",
+    "Pastel Pink":"#ffd1dc",
+    "Lavender":"#e6e6fa",
+    "Light Blue":"#add8e6",
+    "Navy Blue":"#001f3f",
+    "Gray":"#808080",
+    "Emerald Green":"#50c878",
+    "Deep Purple":"#673ab7",
+    "Ruby Red":"#9b111e",
+    "Coral":"#ff7f50",
+    "Denim Blue":"#1560bd",
+    "Blush Pink":"#f9c0c0"
+  };
+  return colorMap[name] || "#ccc";
 }
 
-function getColorCode(colorName) {
-  const colorMap = {
-    "Peach": "#ffd1b3",
-    "Navy Blue": "#001f3f",
-    "Charcoal Gray": "#36454f",
-    "Black": "#000000",
-    "White": "#ffffff",
-    "Light Blue": "#add8e6",
-    "Burgundy": "#800020",
-    "Pastel Pink": "#ffd1dc",
-    "Lavender": "#e6e6fa",
-    "Sage Green": "#9dc183",
-    "Dusty Blue": "#6a8caf",
-    "Gold": "#ffd700",
-    "Champagne": "#f7e7ce",
-    "Ivory": "#fffff0",
-    "Denim Blue": "#1560bd",
-    "Beige": "#f5f5dc",
-    "Olive Green": "#808000",
-    "Gray": "#808080",
-    "Coral": "#ff7f50",
-    "Mustard": "#ffdb58",
-    "Deep Purple": "#301934",
-    "Forest Green": "#228b22",
-    "Rose Gold": "#b76e79",
-    "Blush Pink": "#fe828c",
-    "Cream": "#fffdd0",
-    "Royal Blue": "#4169e1",
-    "Emerald Green": "#50c878",
-    "Ruby Red": "#e0115f",
-    "Silver": "#c0c0c0",
-    "Hot Pink": "#ff69b4",
-    "Dark Gray": "#a9a9a9",
-    "Muted Blue": "#5b7c99",
-    "Khaki": "#c3b091",
-    "Earth Brown": "#654321",
-    "Orange": "#ffa500",
-    "Yellow": "#ffff00",
-    "Mint Green": "#98ff98",
-    "Sky Blue": "#87ceeb",
-    "Turquoise": "#40e0d0",
-    "Aqua": "#00ffff",
-    "Brown": "#a52a2a",
-    "Rust": "#b7410e",
-    "Midnight Blue": "#191970"
+/***********************
+ * UTILITY FUNCTIONS
+ ***********************/
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function getRandomSubset(tops, bottoms, colors){
+  return {
+    tops: shuffle(tops).slice(0,2),
+    bottoms: shuffle(bottoms).slice(0,2),
+    color: shuffle(colors).slice(0,4)
   };
-  return colorMap[colorName] || "#cccccc";
+}
+function showNotification(message){
+  const n = document.createElement('div');
+  n.textContent = message;
+  Object.assign(n.style,{
+    position:"fixed", top:"20px", right:"20px",
+    backgroundColor:"#ef4444", color:"#fff",
+    padding:"16px 24px", borderRadius:"12px",
+    boxShadow:"0 4px 12px rgba(0,0,0,0.2)", zIndex:1000
+  });
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(), 3000);
+}
+function renderDebugInfo(tops, bottoms, colors, userInput){
+  const panel = document.getElementById('debug-panel');
+  if(!panel){
+    console.warn("Debug panel not found");
+    return;
+  }
+
+  panel.innerHTML = `
+    <div style="color:#6ee7b7;font-weight:bold">[DEV MODE] Rule Debug</div>
+
+    <div>
+      <strong>Inputs</strong><br>
+      Gender: ${userInput.gender}<br>
+      Weather: ${userInput.weather}<br>
+      Location: ${userInput.location_type || "—"}<br>
+      Theme: ${userInput.event_theme || "—"}
+    </div>
+
+    <hr style="margin:8px 0;border-color:#064e3b">
+
+    <div>
+      <strong>Remaining Tops</strong><br>
+      ${tops.length ? tops.join('<br>') : '<span style="color:red">NONE</span>'}
+    </div>
+
+    <div style="margin-top:6px">
+      <strong>Remaining Bottoms</strong><br>
+      ${bottoms.length ? bottoms.join('<br>') : '<span style="color:red">NONE</span>'}
+    </div>
+
+    <div style="margin-top:6px">
+      <strong>Remaining Colors</strong><br>
+      ${colors.length ? colors.join('<br>') : '<span style="color:red">NONE</span>'}
+    </div>
+  `;
 }
 
 
 /***********************
- * RULE MATCHING
+ * FILTER LOGIC
  ***********************/
- function filterColorsByWeatherAndTheme(colors, theme, weather) {
-    // Base colors per theme
-    const themeColors = {
-        formal: ["Black", "White", "Navy Blue"],
-        casual: ["Light Blue", "White", "Denim Blue"],
-        cute: ["Pastel Pink", "Lavender", "Blush Pink"],
-        sporty: ["Black", "White", "Coral"],
-        elegant: ["Emerald Green", "Deep Purple", "Ruby Red"],
-        academic: ["Navy Blue", "Gray", "White"]
-    };
+function filterByRules(userInput){
+  let tops = [...allTops];
+  let bottoms = [...allBottoms];
+  let colors = [...allColors];
 
-    let palette = themeColors[theme] || colors;
+  // WEATHER rules
+  if(userInput.weather === "Hot") colors = colors.filter(c=>!["Black","Dark Gray","Midnight Blue"].includes(c));
+  if(userInput.weather === "Rainy") colors = colors.filter(c=>!["White","Pastel Pink"].includes(c));
+  if(userInput.weather === "Windy") colors = colors.filter(c=>["Earth Brown","Olive Green","Khaki","Muted Blue"].includes(c));
 
-    // Weather adjustments
-    if (weather === "Hot") {
-        palette = palette.filter(c => !["Black","Dark Gray","Midnight Blue"].includes(c));
-    }
-    if (weather === "Rainy") {
-        // Optional: adjust for rainy weather
-    }
-
-    return palette.length > 0 ? palette : colors;
-}
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-function runExpertSystem(userInput) {
-  // Step 1: Filter rules by mandatory fields
-  let matchedRules = rules.filter(rule =>
-    rule.gender === userInput.gender &&
-    rule.event_type === userInput.event_type &&
-    rule.weather === userInput.weather
+  // LOCATION rules
+  if(["indoor","office","classroom","hall"].includes(userInput.location_type)){
+    tops = tops.filter(t=>!["T-Shirt","Crop Top"].includes(t));
+    bottoms = bottoms.filter(b=>!["Jeans","Palazzo Pants"].includes(b));
+  }
+// GENDER rules
+if(userInput.gender === "male" || userInput.gender === "boy"){
+  tops = tops.filter(t =>
+    !["Crop Top","Blouse"].includes(t)
   );
 
-  if (!matchedRules.length) return null;
+  bottoms = bottoms.filter(b =>
+    !["Skirt","Palazzo Pants"].includes(b)
+  );
+}
 
-  // Step 2: Adjust top/bottom options based on location
-  let tops = [];
-  let bottoms = [];
-  matchedRules.forEach(rule => {
-    if (userInput.location_type) {
-      if (["indoor","office","classroom","hall"].includes(userInput.location_type.toLowerCase())) {
-        tops.push(...rule.top_options.filter(t => !["T-shirt","Crop top"].includes(t))); // prefer formal
-        bottoms.push(...rule.bottom_options.filter(b => !["Jeans","Palazzo"].includes(b)));
-      } else if (["outdoor","park"].includes(userInput.location_type.toLowerCase())) {
-        tops.push(...rule.top_options);
-        bottoms.push(...rule.bottom_options);
-      }
-    } else {
-      tops.push(...rule.top_options);
-      bottoms.push(...rule.bottom_options);
-    }
-  });
+if(userInput.gender === "female" || userInput.gender === "girl"){
+  // Optional – currently no hard restriction
+  // Keep flexible for inclusivity
+}
 
-  tops = shuffle([...new Set(tops)]).slice(0,2);
-  bottoms = shuffle([...new Set(bottoms)]).slice(0,2);
+  // THEME rules
+  const themeColors = {
+    cute: ["Pastel Pink","Lavender","Blush Pink"],
+    formal: ["Black","White","Navy Blue"],
+    sporty: ["Black","White","Coral"],
+    academic: ["Navy Blue","Gray","White"],
+    elegant: ["Emerald Green","Deep Purple","Ruby Red"],
+    casual: ["Light Blue","White","Denim Blue"]
+  };
+  if(userInput.event_theme) colors = colors.filter(c=>themeColors[userInput.event_theme]?.includes(c));
 
-  // Step 3: Filter colors based on weather + theme
-  let colors = [];
-  matchedRules.forEach(rule => {
-    colors.push(...rule.color);
-  });
+  filteredTops = tops;
+  filteredBottoms = bottoms;
+  filteredColors = colors;
+  renderDebugInfo(tops, bottoms, colors, userInput);
 
-  colors = [...new Set(colors)]; // remove duplicates
-
-  if (userInput.event_theme) {
-    colors = filterColorsByWeatherAndTheme(colors, userInput.event_theme, userInput.weather);
-  } else {
-    colors = filterColorsByWeather(colors, userInput.weather);
-  }
-
-  return { tops, bottoms, color: shuffle(colors).slice(0,4) };
+  return getRandomSubset(filteredTops, filteredBottoms, filteredColors);
 }
 
 /***********************
- * LOAD HTML PARTIALS
+ * DISPLAY RESULTS
  ***********************/
-async function load(id, file) {
-  try {
-    const res = await fetch(file);
-    const html = await res.text();
-    document.getElementById(id).innerHTML = html;
-  } catch (err) {
-    console.error(`Failed to load ${file}:`, err);
+function displayRuleResult(result){
+  const colorSwatches = document.getElementById('color-swatches');
+  const combos = document.getElementById('combinations-list');
+  const resultsSection = document.getElementById('result-container');
+
+  if(!colorSwatches || !combos || !resultsSection){
+    console.warn("Result elements not found");
+    return;
   }
+
+  // Color swatches
+  colorSwatches.innerHTML = result.color.map(c => `
+    <div class="text-center">
+      <div class="color-swatch mb-2 w-10 h-10 mx-auto" style="background:${getColorCode(c)}"></div>
+      <p class="text-sm font-medium">${c}</p>
+    </div>
+  `).join('');
+
+  // Outfit combinations
+  const createGrid = (items, type) => `
+    <div class="mb-6">
+      <h4 class="font-semibold text-center mb-3">${type} Wear</h4>
+      <div class="grid grid-cols-2 gap-4">
+        ${items.map(i=>`
+          <div class="text-center outfit-card">
+            <img src="/images/${type.toLowerCase()}s/${i.toLowerCase().replace(/\s/g,'_')}.jpg"
+                 class="w-full max-h-40 object-contain rounded-xl mb-2">
+            <p class="text-sm font-medium">${i}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  combos.innerHTML =
+    createGrid(result.tops,"Top") +
+    createGrid(result.bottoms,"Bottom");
+
+  // Reveal results
+  resultsSection.classList.remove('hidden','opacity-0');
+  resultsSection.classList.add('opacity-100');
 }
 
 /***********************
- * FORM HANDLER
+ * FORM HANDLERS
  ***********************/
-function handleFormSubmit(e) {
+function handleFormSubmit(e){
   e.preventDefault();
-
-  const results = document.getElementById('results');
-
-  let userInput = {
+  const userInput = {
     event_type: document.getElementById('event-type')?.value,
     weather: document.getElementById('weather')?.value,
     location_type: document.getElementById('location')?.value,
@@ -462,204 +425,109 @@ function handleFormSubmit(e) {
     gender: document.getElementById('gender')?.value
   };
 
-  // Remove empty fields
-  userInput = Object.fromEntries(
-    Object.entries(userInput).filter(([_, v]) => v && v !== "")
-  );
-  // Mandatory fields check
-if (!userInput.gender || !userInput.event_type || !userInput.weather) {
+  const cleaned = Object.fromEntries(Object.entries(userInput).filter(([_,v])=>v && v!==""));
+  if(!cleaned.gender || !cleaned.event_type || !cleaned.weather){
     showNotification("Please provide Gender, Event Type, and Weather.");
     return;
+  }
+
+  displayRuleResult(filterByRules(cleaned));
 }
 
-  const result = runExpertSystem(userInput);
-
-  if (!result) {
-    showNotification("No matching outfit rule found");
+function pickOtherCombination(){
+  if(!filteredTops.length || !filteredBottoms.length || !filteredColors.length){
+    showNotification("Submit the form first!");
     return;
   }
-
-  displayRuleResult(result);
-
-  // 🔹 Show results smoothly
-  results.classList.remove('hidden');
-  setTimeout(() => {
-    results.style.opacity = 1;
-  }, 50);
+  displayRuleResult(getRandomSubset(filteredTops, filteredBottoms, filteredColors));
 }
 
 /***********************
- * DISPLAY RESULTS
+ * STAR RAIN
  ***********************/
-function displayRuleResult(result) {
-  document.getElementById('color-swatches').innerHTML =
-  result.color.slice(0, 4).map(c => `
-    <div class="text-center">
-      <div 
-        class="w-full h-20 rounded-xl mb-2 border border-gray-400"
-        style="background:${getColorCode(c)}">
-      </div>
-      <p class="text-sm">${c}</p>
-    </div>
-  `).join('');
-
-
-document.getElementById('combinations-list').innerHTML = `
-  <div class="space-y-6">
-
-    <!-- TOPS -->
-    <div>
-      <h4 class="font-semibold text-center mb-3">Top Wear</h4>
-      <div class="grid grid-cols-2 gap-4">
-        ${result.tops.map(top => `
-          <div class="text-center">
-            <img 
-              src="/images/tops/${top.toLowerCase().replace(/\s/g,'_')}.jpg"
-              class="w-full max-h-40 object-contain rounded-xl mb-2">
-            <p class="text-sm font-medium">${top}</p>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-
-    <!-- BOTTOMS -->
-    <div>
-      <h4 class="font-semibold text-center mb-3">Bottom Wear</h4>
-      <div class="grid grid-cols-2 gap-4">
-        ${result.bottoms.map(bottom => `
-          <div class="text-center">
-            <img 
-              src="/images/bottoms/${bottom.toLowerCase().replace(/\s/g,'_')}.jpg"
-              class="w-full max-h-40 object-contain rounded-xl mb-2">
-            <p class="text-sm font-medium">${bottom}</p>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-
-  </div>
-`;
-
-  document.getElementById('results-section').style.display = "block";
-}
-
-/***********************
- * NOTIFICATION
- ***********************/
-function showNotification(message) {
-  const notification = document.createElement('div');
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #ef4444;
-    color: white;
-    padding: 16px 24px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
-  `;
-  document.body.appendChild(notification);
-  setTimeout(() => notification.remove(), 3000);
-}
-
-/***********************
- * INITIALIZE APP
- ***********************/
-async function initApp() {
-  await loadRules();
-  await load("form", "parts/form.html");
-  await load("results", "parts/result.html");
-
-  const form = document.getElementById('outfit-form');
-  if (form) {
-    form.addEventListener('submit', handleFormSubmit);
-  } else {
-    console.error("Form not found! Ensure parts/form.html has id='outfit-form'");
-  }
-}
-
-  /* ===============================
-     STAR RAIN JAVASCRIPT LOGIC
-     =============================== */
-  document.addEventListener('DOMContentLoaded', () => {
-  /* Container that holds all falling stars */
+function initStarRain(){
   const container = document.getElementById('sprinkle-rain');
-  
-  /* Color and shape variations for visual diversity */
+  if(!container) return;
   const colors = ['#FFFFFF','#d1c5b1','#d1b386','#be6e3f','#b9885c'];
   const shapes = ['✦','✧','★','✶','✴','✷'];
-  
-  /* Track active stars for cleanup */
-  const activeStars = [];
 
-    /* ===============================
-     FUNCTION: CREATE A SINGLE STAR
-     =============================== */
-  function createStar() {
+  function createStar(){
     const star = document.createElement('div');
     star.className = 'star';
-
-    /* Randomized visual properties */
-    const size = Math.random() * 14 + 10;
-    const left = Math.random() * window.innerWidth;
-    const duration = Math.random() * 3000 + 2000;
-    const delay = Math.random() * 1000;
+    const size=Math.random()*14+10, left=Math.random()*window.innerWidth;
     const shape = shapes[Math.floor(Math.random()*shapes.length)];
     const color = colors[Math.floor(Math.random()*colors.length)];
-    const floatSpeed = Math.random() * 2 + 1;
-    const baseOpacity = Math.random() * 0.4 + 0.3;
-
-    /* Apply star styles */
-    star.innerHTML = shape;
     star.style.fontSize = size+'px';
     star.style.left = left+'px';
     star.style.top = '-30px';
     star.style.color = color;
-    star.style.opacity = baseOpacity;
-    star.style.animation = `twinkle ${duration}ms infinite alternate, float ${floatSpeed}s infinite ease-in-out`;
-    star.style.animationDelay = `${delay}ms`;
-
+    star.innerHTML = shape;
     container.appendChild(star);
-    activeStars.push({el: star, baseOpacity});
-
-       /* ===============================
-       FALLING ANIMATION (MANUAL)
-       =============================== */
+    const fallDuration = Math.random()*5000+8000;
     const startTime = Date.now();
-    const fallDuration = Math.random() * 5000 + 8000;
-    const startY = -30;
-    const endY = window.innerHeight + 30;
-
-    function animateFall() {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / fallDuration, 1);
-      const currentY = startY + progress * (endY - startY);
-      star.style.top = currentY + 'px';
-      
-      if (progress > 0.8) star.style.opacity = baseOpacity * (1 - (progress - 0.8)*5);
-      if (progress < 1) requestAnimationFrame(animateFall);
-      else {
-        const index = activeStars.findIndex(s => s.el === star);
-        if(index > -1) activeStars.splice(index,1);
-        star.remove();
-      }
+    function fall(){ 
+      const progress=(Date.now()-startTime)/fallDuration; 
+      star.style.top = (-30 + progress*(window.innerHeight+60))+'px';
+      if(progress<1) requestAnimationFrame(fall);
+      else star.remove();
     }
-
-    requestAnimationFrame(animateFall);
+    requestAnimationFrame(fall);
   }
 
-  for(let i=0;i<20;i++) setTimeout(()=>createStar(),i*100);
-  const interval = setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
-  window.addEventListener('beforeunload',()=>{clearInterval(interval); activeStars.forEach(s=>s.el.remove());});
+  for(let i=0;i<20;i++) setTimeout(createStar,i*100);
+  setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
+}
+function renderDebugInfo(tops, bottoms, colors, userInput){
+  const panel = document.getElementById('debug-panel');
+  if(!panel) return;
+
+  panel.innerHTML = `
+    <div class="mb-2 text-green-400 font-bold">[DEV MODE] Rule Evaluation</div>
+
+    <div class="mb-2">
+      <span class="text-yellow-300">Input Facts:</span><br>
+      Gender: ${userInput.gender}<br>
+      Weather: ${userInput.weather}<br>
+      Location: ${userInput.location_type || "—"}<br>
+      Theme: ${userInput.event_theme || "—"}
+    </div>
+
+    <div class="mb-2">
+      <span class="text-yellow-300">Remaining Tops:</span><br>
+      ${tops.map(t=>`• ${t}`).join('<br>')}
+    </div>
+
+    <div class="mb-2">
+      <span class="text-yellow-300">Remaining Bottoms:</span><br>
+      ${bottoms.map(b=>`• ${b}`).join('<br>')}
+    </div>
+
+    <div>
+      <span class="text-yellow-300">Remaining Colors:</span><br>
+      ${colors.map(c=>`• ${c}`).join('<br>')}
+    </div>
+  `;
+
+  panel.classList.remove('hidden');
+}
+
+
+/***********************
+ * MAIN INIT
+ ***********************/
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await loadHTML('./parts/form.html','form-container');
+  await loadHTML('./parts/result.html','result-container');
+
+  const form = document.querySelector('#outfit-form');
+  if(form) form.addEventListener('submit', handleFormSubmit);
+
+  const pickBtn = document.querySelector('#pick-other-btn');
+  if(pickBtn) pickBtn.addEventListener('click', pickOtherCombination);
+
+  initStarRain();
 });
-
-// Start app
-initApp();
 </script>
-
 
 </body>
 </html>
