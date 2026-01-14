@@ -32,10 +32,10 @@
     /* ===============================
        TYPOGRAPHY STYLES
        =============================== */
-  .font-main-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dark); }
-  .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
-  .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
-  .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
+      .font-main-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dark); }
+      .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
+      .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
+      .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
 
     /* ===============================
        GLOBAL PAGE STYLING
@@ -105,33 +105,19 @@
       box-shadow:0 0 20px rgba(210,179,134,.6);
     }
 
-    /* Result card */
+
     .recommendation-card {
-  background: rgba(255, 255, 255, 0);
-  backdrop-filter: blur(12px);
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0);
-  box-shadow: 
-    0 20px 40px rgba(0,0,0,0.12),
-    0 10px 20px rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(16px);
+    }
 
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  height: 100%;          /* match right-container */
-  width: 100%;           /* fill container width */
-  max-width: none;       /* allow wider than form */
-  overflow: hidden;      /* prevent scrollbars */
-
-  animation: slideIn .6s ease;  /* keep animation */
-}
-
-
-    @keyframes slideIn {
-      from {opacity:0;transform:translateY(30px)}
-      to {opacity:1;transform:none}
+    .recommendation-card > div:nth-child(2) {
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255,255,255,0.4),
+        transparent
+      );
     }
 
     /* Button */
@@ -144,25 +130,6 @@
       transform:translateY(-3px);
       box-shadow:0 12px 30px rgba(0,0,0,.5);
     }
-    .left-container {
-      height: 100%;           /* match parent height (form height) */
-      position: relative;
-      }
-          .right-container {
-        height: 100%;           /* match parent height (form height) */
-        position: relative;
-      }
-
-      #results {
-        height: 100%;           /* take full height of right-container */
-        overflow-y: auto;       /* scroll inside if content too tall */
-      }
-
-      #results-placeholder {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-      }
 
   </style>
 </head>
@@ -175,7 +142,7 @@
 <!-- App wrapper (NO background here) -->
 <div id="app-wrapper" class="relative min-h-screen z-20">
 
-  <div class="py-12 px-6">
+  <div class="py-8 px-5">
     <div class="max-w-6xl mx-auto">
 
       <!-- Header -->
@@ -186,33 +153,47 @@
         <p class="text-xl text-brown-100">
           Expert color recommendations based on event, season & location
         </p>
-        <p class="text-sm text-black-200">
+        <p class="text-sm mb-2 text-black-200">
           Rule-based inference system for optimal combinations
         </p>
       </header>
 
-      <!-- MAIN GRID -->
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.8fr] gap-0 h-full">
-        <!-- FORM -->
-        <section class="left-container bg-transparent p-8 h-full">
-          <div id="form" class="h-full"></div>
-        </section>
+    <!-- SINGLE PANEL CONTAINER -->
+    <div class="max-w-6xl mx-auto h-[80vh] bg-white/20 backdrop-blur-xl rounded-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
+
+      <!-- LEFT: FORM -->
+      <section class="w-full md:w-2/5 p-10 flex flex-col justify-center">
+        <div id="form" class="space-y-4 w-full max-w-xs mt-8 mb-8"></div>
+      </section>
+
+      <!-- DIVIDER -->
+      <div class="w-full md:w-px h-px md:h-auto bg-black/30 my-4 md:my-0"></div>
+
+      <!-- RIGHT: RESULTS -->
+      <section class="w-full md:w-3/5 p-3 flex flex-col overflow-y-auto">
+        <!-- TITLE -->
+        <h2 class="text-3xl font-bold text-center mb-2 font-card-title">
+          Your Personalized Outfit
+        </h2>
 
         <!-- RESULTS -->
-        <section class="bg-transparent p-3 h-full">
-          <div class="right-container relative bg-transparent h-full">
-            <div id="results-placeholder" class=" inset-0 flex flex-col items-center justify-center text-center px-4">
-              <svg class="w-14 h-12 mb-4 opacity-60" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2z"/>
-              </svg>
-              <p class="text-lg">Your recommendation will appear here</p>
-              <p class="text-sm mt-1">Complete the form and click “Get Color Recommendations”</p>
-            </div>
-            <div id="results" class=" hidden h-full overflow-y-auto p-6"></div>
-          </div>
-        </section>
-      </div>
+        <div id="results" class="flex-1 overflow-y-auto hidden opacity-0 transition-opacity duration-500">
+          <div id="color-swatches" class="grid grid-cols-2 gap-4 mb-6"></div>
+          <div id="combinations-list"></div>
+        </div>
+      </section>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+  </div>
+</div>
+
     </div>
   </div>
 </div>
@@ -471,28 +452,7 @@ async function load(id, file) {
 function handleFormSubmit(e) {
   e.preventDefault();
 
-  // Hide placeholder immediately on submit
-  const placeholder = document.getElementById('results-placeholder');
   const results = document.getElementById('results');
-
-  // Hide placeholder with fade
-  placeholder.style.transition = "opacity 0.5s ease";
-  placeholder.style.opacity = 0;
-
-  // After fade out, hide completely and show results
-  setTimeout(() => {
-    placeholder.style.display = 'none';
-    
-    results.style.display = 'block';
-    results.style.opacity = 0; // start hidden
-    
-    // Fade in
-    setTimeout(() => {
-      results.style.opacity = 1;
-    }, 50);
-
-  }, 500);
-
 
   let userInput = {
     event_type: document.getElementById('event-type')?.value,
@@ -512,7 +472,6 @@ if (!userInput.gender || !userInput.event_type || !userInput.weather) {
     return;
 }
 
-
   const result = runExpertSystem(userInput);
 
   if (!result) {
@@ -521,6 +480,12 @@ if (!userInput.gender || !userInput.event_type || !userInput.weather) {
   }
 
   displayRuleResult(result);
+
+  // 🔹 Show results smoothly
+  results.classList.remove('hidden');
+  setTimeout(() => {
+    results.style.opacity = 1;
+  }, 50);
 }
 
 /***********************
@@ -616,22 +581,6 @@ async function initApp() {
   }
 }
 
-/* ===============================
-     PLACEHOLDER BEFORE RESULTS
-     =============================== */
-const observer = new MutationObserver(() => {
-    const resultsSection = document.getElementById('results-section');
-    if (resultsSection && resultsSection.style.display === "block") {
-      const placeholder = document.getElementById('results-placeholder');
-      if (placeholder) placeholder.style.display = "none";
-    }
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-
   /* ===============================
      STAR RAIN JAVASCRIPT LOGIC
      =============================== */
@@ -706,58 +655,6 @@ const observer = new MutationObserver(() => {
   const interval = setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
   window.addEventListener('beforeunload',()=>{clearInterval(interval); activeStars.forEach(s=>s.el.remove());});
 });
-
-      /* ===============================
-       MATCCH RIGHT AND LEFT CONTAINER
-       =============================== */
-    function matchLeftRightHeight() {
-      const left = document.querySelector('section:first-child');
-      const right = document.querySelector('section:last-child');
-
-      // Reset right height first so content can grow naturally
-      right.style.height = 'auto';
-
-      // Get computed height of left
-      const leftHeight = left.getBoundingClientRect().height;
-
-      // Set right height to match left
-      right.style.height = `${leftHeight}px`;
-    }
-
-    // Call after DOM loaded and content rendered
-    window.addEventListener('load', () => {
-      setTimeout(matchLeftRightHeight, 50); // small delay to let DOM render
-    });
-    window.addEventListener('resize', matchLeftRightHeight);
-
-
-      /* ===============================
-       SHOW RESULT FADE IN
-       =============================== */
-    function showResultsSmoothly(result) {
-      const placeholder = document.getElementById('results-placeholder');
-      const results = document.getElementById('results');
-
-      // fade out placeholder
-      placeholder.style.transition = "opacity 0.5s ease";
-      placeholder.style.opacity = 0;
-
-      setTimeout(() => {
-      placeholder.style.display = 'none';
-
-      // insert result
-      displayRuleResult(result); // your function fills #results
-
-      // show results with fade-in
-      results.style.display = 'block';
-       results.style.opacity = 0;
-
-      setTimeout(() => {
-      results.style.opacity = 1;
-      }, 50);
-
-      }, 500);
-    }
 
 // Start app
 initApp();
