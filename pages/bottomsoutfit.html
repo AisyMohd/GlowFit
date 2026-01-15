@@ -7,7 +7,6 @@
 <link rel="icon" type="image/png" href="/images/logo glowfit.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --tamarillo: #9e1814;
@@ -135,7 +134,6 @@
 <!-- Stars -->
 <div id="sprinkle-rain"></div>
 
-
 <!-- App wrapper (NO background here) -->
 <div id="app-wrapper" class="relative min-h-screen z-20">
 
@@ -203,15 +201,27 @@
   <!-- Scripts -->
 <script>
 /***********************
- * HELPER: SHUFFLE ARRAY
+ * HELPER: LOAD HTML PARTS
  ***********************/
-const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+async function loadHTML(url, containerId){
+  try{
+    const res = await fetch(url);
+    const html = await res.text();
+    const container = document.getElementById(containerId);
+    if(container) container.innerHTML = html;
+  }catch(err){
+    console.error(`Failed to load ${url}`, err);
+  }
+}
 
 /***********************
  * KNOWLEDGE BASE
  ***********************/
 const KB = {
-  tops: ["T-Shirt","Crop Top","Blouse","Shirt"],
+  tops: [
+    "T-Shirt","Shirt","Blouse","Crop Top",
+    "Hoodie","Sweater","Tank Top","Long Sleeve Top"
+  ],
   bottoms: ["Jeans","Palazzo Pants","Skirt","Shorts"],
   colors: [
     "Black","White","Pastel Pink","Lavender","Light Blue",
@@ -226,11 +236,15 @@ const KB = {
     elegant: ["Emerald Green","Deep Purple","Ruby Red"],
     casual: ["Light Blue","White","Denim Blue"]
   },
-  compatibleBottoms: {
-    "T-Shirt": ["Jeans","Shorts"],
-    "Crop Top": ["Skirt","Palazzo Pants","Shorts"],
-    "Blouse": ["Skirt","Palazzo Pants","Jeans"],
-    "Shirt": ["Jeans","Palazzo Pants"]
+  compatibleBottoms:{
+    "T-Shirt": ["Jeans","Shorts","Palazzo Pants"],
+    "Shirt": ["Jeans","Palazzo Pants"],
+    "Blouse": ["Jeans","Palazzo Pants","Skirt"],
+    "Crop Top": ["Palazzo Pants","Skirt","Shorts"],
+    "Hoodie": ["Jeans","Shorts"],
+    "Sweater": ["Jeans","Skirt"],
+    "Tank Top": ["Jeans","Shorts"],
+    "Long Sleeve Top": ["Jeans","Palazzo Pants","Skirt"]
   }
 };
 
@@ -246,6 +260,8 @@ let filteredState = {
 /***********************
  * UTILITIES
  ***********************/
+const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
+
 function getColorCode(name){
   const map = {
     Black:"#000", White:"#fff", Gray:"#808080",
@@ -262,9 +278,9 @@ function showNotification(msg){
   const n = document.createElement('div');
   n.textContent = msg;
   Object.assign(n.style,{
-    position:"fixed", top:"20px", right:"20px",
-    background:"#ef4444", color:"#fff",
-    padding:"16px 24px", borderRadius:"12px",
+    position:"fixed",top:"20px",right:"20px",
+    background:"#ef4444",color:"#fff",
+    padding:"16px 24px",borderRadius:"12px",
     zIndex:1000
   });
   document.body.appendChild(n);
@@ -272,89 +288,110 @@ function showNotification(msg){
 }
 
 /***********************
- * RULE ENGINE: BOTTOM
+ * RULE ENGINE
  ***********************/
-function applyRulesBottom(user){
+function applyRules(user){
   let bottoms = [...KB.bottoms];
   let colors = [...KB.colors];
-  const selectedTop = user.top;
 
-  // WEATHER RULES
-  if(user.weather === "Hot") colors = colors.filter(c => !["Black","Gray"].includes(c));
-  if(user.weather === "Rainy") colors = colors.filter(c => !["White","Pastel Pink"].includes(c));
+  // WEATHER
+  if(user.weather === "Hot"){
+    colors = colors.filter(c=>!["Black","Gray"].includes(c));
+  }
+  if(user.weather === "Rainy"){
+    colors = colors.filter(c=>!["White","Pastel Pink"].includes(c));
+  }
 
-  // LOCATION RULES
+  // LOCATION
   if(["indoor","office","classroom","hall"].includes(user.location_type)){
-    bottoms = bottoms.filter(b => b !== "Shorts");
+    bottoms = bottoms.filter(b=>b!=="Shorts");
   }
 
-  // GENDER RULES
+  // GENDER
   if(["male","boy"].includes(user.gender)){
-    bottoms = bottoms.filter(b => b !== "Skirt");
+    bottoms = bottoms.filter(b=>b!=="Skirt");
   }
 
-  // THEME RULES
+  // THEME
   if(user.event_theme && KB.themeColors[user.event_theme]){
-    colors = colors.filter(c => KB.themeColors[user.event_theme].includes(c));
+    colors = colors.filter(c=>KB.themeColors[user.event_theme].includes(c));
   }
 
-  // TOP COMPATIBILITY
-  if(selectedTop && KB.compatibleBottoms[selectedTop]){
-    bottoms = bottoms.filter(b => KB.compatibleBottoms[selectedTop].includes(b));
+  // TOP → BOTTOM COMPATIBILITY (CORRECT)
+  if(user.top && KB.compatibleBottoms[user.top]){
+    bottoms = bottoms.filter(b =>
+      KB.compatibleBottoms[user.top].includes(b)
+    );
   }
 
-  filteredState = { bottoms, colors, top: selectedTop };
+  filteredState = { bottoms, colors, top: user.top };
 
-  renderDebugInfoBottom(bottoms, selectedTop, colors, user);
-
-  return getRandomSubsetBottom(bottoms, selectedTop, colors);
-}
-
-/***********************
- * SUBSET PICKING
- ***********************/
-function getRandomSubsetBottom(bottoms, top, colors){
   return {
-    tops: [top],
+    top: user.top,
     bottoms: shuffle(bottoms).slice(0,2),
-    color: shuffle(colors).slice(0,4)
+    colors: shuffle(colors).slice(0,4)
   };
+}
+/***********************
+ * DEBUG PANEL (BOTTOM LOGIC)
+ ***********************/
+function renderDebugInfo(bottoms, selectedTop, colors, user){
+  const panel = document.getElementById('debug-panel');
+  if(!panel) return;
+
+  panel.innerHTML = `
+    <div class="text-green-400 font-bold mb-2">
+      [DEV MODE] Bottom Rule Evaluation
+    </div>
+
+    <div class="mb-3 text-yellow-300 leading-relaxed">
+      <b>Gender:</b> ${user.gender}<br>
+      <b>Weather:</b> ${user.weather}<br>
+      <b>Location:</b> ${user.location_type || "—"}<br>
+      <b>Theme:</b> ${user.event_theme || "—"}<br>
+      <b>Selected Top:</b> ${selectedTop || "—"}
+    </div>
+
+    <div class="mb-3">
+      <b class="text-green-300">Compatible Bottoms</b><br>
+      ${bottoms.length ? bottoms.join("<br>") : "<span class='text-red-400'>NONE</span>"}
+    </div>
+
+    <div>
+      <b class="text-green-300">Available Colors</b><br>
+      ${colors.length ? colors.join("<br>") : "<span class='text-red-400'>NONE</span>"}
+    </div>
+  `;
+
+  panel.classList.remove('hidden');
 }
 
 /***********************
  * DISPLAY RESULTS
  ***********************/
-function displayRuleResultBottom(result){
+function displayRuleResult(result){
+  const section = document.getElementById('result-container');
   const swatches = document.getElementById('color-swatches');
   const combos = document.getElementById('combinations-list');
-  const section = document.getElementById('result-container');
-  if(!swatches || !combos || !section) return;
+  if(!section || !swatches || !combos) return;
 
-  // COLORS
-  swatches.innerHTML = result.color.map(c => `
+  swatches.innerHTML = result.colors.map(c=>`
     <div class="text-center">
       <div class="w-10 h-10 mx-auto rounded-full" style="background:${getColorCode(c)}"></div>
       <p class="text-sm">${c}</p>
     </div>
   `).join("");
 
-  // TOP
   combos.innerHTML = `
     <div class="mb-6">
       <h4 class="text-center font-semibold mb-3">Your Top</h4>
-      <div class="grid grid-cols-1 gap-4">
-        <div class="text-center">
-          <img src="/images/tops/${result.tops[0].toLowerCase().replace(/\s/g,'_')}.jpg"
-               class="w-full max-h-40 object-contain rounded-xl mb-2">
-          <p>${result.tops[0]}</p>
-        </div>
-      </div>
+      <p class="text-center">${result.top}</p>
     </div>
 
-    <div class="mb-6">
+    <div>
       <h4 class="text-center font-semibold mb-3">Recommended Bottoms</h4>
       <div class="grid grid-cols-2 gap-4">
-        ${result.bottoms.map(b => `
+        ${result.bottoms.map(b=>`
           <div class="text-center">
             <img src="/images/bottoms/${b.toLowerCase().replace(/\s/g,'_')}.jpg"
                  class="w-full max-h-40 object-contain rounded-xl mb-2">
@@ -369,33 +406,11 @@ function displayRuleResultBottom(result){
 }
 
 /***********************
- * DEBUG PANEL
- ***********************/
-function renderDebugInfoBottom(bottoms, top, colors, user){
-  const panel = document.getElementById('debug-panel');
-  if(!panel) return;
-
-  panel.innerHTML = `
-    <div class="text-green-400 font-bold mb-2">[DEV MODE] Bottom Rules</div>
-    <div class="mb-2 text-yellow-300">
-      Gender: ${user.gender}<br>
-      Weather: ${user.weather}<br>
-      Location: ${user.location_type || "—"}<br>
-      Theme: ${user.event_theme || "—"}<br>
-      Selected Top: ${top || "—"}
-    </div>
-    <div class="mb-2"><b>Compatible Bottoms</b><br>${bottoms.join("<br>") || "NONE"}</div>
-    <div><b>Colors</b><br>${colors.join("<br>") || "NONE"}</div>
-  `;
-
-  panel.classList.remove('hidden');
-}
-
-/***********************
  * FORM HANDLER
  ***********************/
-function handleFormSubmitBottom(e){
+function handleFormSubmit(e){
   e.preventDefault();
+
   const user = {
     gender: document.getElementById('gender')?.value,
     weather: document.getElementById('weather')?.value,
@@ -404,49 +419,42 @@ function handleFormSubmitBottom(e){
     event_type: document.getElementById('event-type')?.value,
     top: document.getElementById('user-top')?.value
   };
+
   if(!user.gender || !user.weather || !user.event_type || !user.top){
     showNotification("Please fill Gender, Weather, Event Type and Top.");
     return;
   }
-  displayRuleResultBottom(applyRulesBottom(user));
+
+  // 👉 APPLY RULES ONCE
+  const result = applyRules(user);
+
+  // 👉 SHOW RESULTS
+  displayRuleResult(result);
+
+  // 👉 SHOW DEBUG (THIS WAS MISSING)
+  renderDebugInfo(
+    filteredState.bottoms, // FULL compatible bottoms
+    user.top,
+    filteredState.colors,
+    user
+  );
 }
 
 /***********************
- * RE-PICK OTHER COMBO
+ * RE-PICK
  ***********************/
 function pickOtherCombination(){
   if(!filteredState.bottoms.length){
     showNotification("Submit the form first!");
     return;
   }
-  displayRuleResult(
-    getRandomSubset(
-      filteredState.tops,
-      [filteredState.bottom],
-      filteredState.colors
-    )
-  );
+
+  displayRuleResult({
+    top: filteredState.top,
+    bottoms: shuffle(filteredState.bottoms).slice(0,2),
+    colors: shuffle(filteredState.colors).slice(0,4)
+  });
 }
-
-
-/***********************
- * DYNAMIC HTML LOADING
- ***********************/
-async function loadHTML(url, containerId, onLoadCallback){
-  try {
-    const res = await fetch(url);
-    if(!res.ok) throw new Error(`Failed to load ${url}`);
-    const html = await res.text();
-    const container = document.getElementById(containerId);
-    if(container){
-      container.innerHTML = html;
-      if(onLoadCallback) onLoadCallback(container);
-    }
-  } catch(err){
-    console.error(err);
-  }
-}
-
 /***********************
  * STAR RAIN EFFECT
  ***********************/
@@ -483,8 +491,9 @@ function initStarRain(){
   setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
 }
 
+
 /***********************
- * MAIN INIT
+ * INIT
  ***********************/
 document.addEventListener('DOMContentLoaded', async ()=>{
   await loadHTML('./parts/formbottom.html','form-container');
@@ -496,6 +505,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   initStarRain();
 });
 </script>
+
 
 
 </body>

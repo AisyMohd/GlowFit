@@ -3,8 +3,12 @@
 
     <!-- Event Type -->
     <div class="mb-6">
-      <label for="event-type" class="block text-lg font-semibold mb-3 text-slate-800">Event Type</label>
-      <select id="event-type">
+      <label for="event-type" id="event-type-label"
+        class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
+        Event Type
+      </label>
+
+      <select id="event-type" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
         <option value="">Select an event...</option>
         <option value="going to class">Going to Class</option>
         <option value="presentation">Presentation</option>
@@ -17,10 +21,44 @@
       </select>
     </div>
 
+    <!-- Gender -->
+    <div class="mb-8">
+      <label for="gender" id="gender-label"
+        class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
+        Gender
+      </label>
+
+      <select id="gender" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+        <option value="">Select gender...</option>
+        <option value="girl">Girl</option>
+        <option value="boy">Boy</option>
+      </select>
+    </div>
+
+    <!-- Weather -->
+    <div class="mb-6">
+      <label for="weather" id="weather-label"
+        class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
+        Weather
+      </label>
+
+      <select id="weather" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+        <option value="">Select weather...</option>
+        <option value="Sunny">Sunny</option>
+        <option value="Hot">Hot</option>
+        <option value="Cloudy">Cloudy</option>
+        <option value="Rainy">Rainy</option>
+        <option value="Windy">Windy</option>
+      </select>
+    </div>
     <!-- Event Theme -->
     <div class="mb-6">
-      <label for="event-theme" class="block text-lg font-semibold mb-3 text-slate-800">Event Theme</label>
-      <select id="event-theme">
+      <label for="event-theme" id="event-theme-label"
+        class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
+        Event Theme
+      </label>
+
+      <select id="event-theme" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
         <option value="">Select theme...</option>
         <option value="cute">Cute</option>
         <option value="formal">Formal</option>
@@ -31,23 +69,14 @@
       </select>
     </div>
 
-    <!-- Weather -->
-    <div class="mb-6">
-      <label for="weather" class="block text-lg font-semibold mb-3 text-slate-800">Weather</label>
-      <select id="weather">
-        <option value="">Select weather...</option>
-        <option value="Sunny">Sunny</option>
-        <option value="Hot">Hot</option>
-        <option value="Cloudy">Cloudy</option>
-        <option value="Rainy">Rainy</option>
-        <option value="Windy">Windy</option>
-      </select>
-    </div>
-
     <!-- Location -->
     <div class="mb-8">
-      <label for="location" class="block text-lg font-semibold mb-3 text-slate-800">Location</label>
-      <select id="location">
+      <label for="location" id="location-label"
+        class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
+        Location
+      </label>
+
+      <select id="location" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
         <option value="">Select location...</option>
         <option value="indoor">Indoor</option>
         <option value="outdoor">Outdoor</option>
@@ -58,26 +87,28 @@
       </select>
     </div>
 
-    <!-- Gender -->
-    <div class="mb-8">
-      <label for="gender" class="block text-lg font-semibold mb-3 text-slate-800">Gender</label>
-      <select id="gender">
-        <option value="">Select gender...</option>
-        <option value="girl">Girl</option>
-        <option value="boy">Boy</option>
-      </select>
-    </div>
 
     <!-- Top -->
     <div class="mb-6">
-          <label class="block mb-2 font-semibold text-gray-700">Your Top</label>
-          <<select id="user-top" class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-purple-400">
-  <option value="">Select top...</option>
-  <option value="Blouse">Blouse</option>
-  <option value="Shirt">Shirt</option>
-</select>
+      <label class="block mb-2 font-semibold text-gray-700">
+        Your Top
+      </label>
+      <select
+          id="user-top"
+          class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-purple-400"
+        >
+        <option value="">Select top...</option>
+        <option value="T-Shirt">T-Shirt</option>
+        <option value="Shirt">Shirt</option>
+        <option value="Blouse">Blouse</option>
+        <option value="Crop Top">Crop Top</option>
+        <option value="Hoodie">Hoodie</option>
+        <option value="Sweater">Sweater</option>
+        <option value="Tank Top">Tank Top</option>
+        <option value="Long Sleeve Top">Long Sleeve Top</option>
+      </select>
+</div>
 
-        </div>
     <button type="submit" id="submit-btn"
       class="submit-btn w-full py-4 rounded-xl font-bold text-xl shadow-lg bg-indigo-600 text-white">
       Get Color Recommendations
