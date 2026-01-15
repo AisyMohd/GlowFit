@@ -3,90 +3,200 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Outfit  Advisor</title>
+  <title>Smart Outfit Advisor</title>
 
   <!-- SDKs -->
   <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/data_sdk.js"></script>
 
-  <!-- TailwindCSS -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Styles -->
   <style>
+    :root {
+      --tamarillo: #9e1814;
+    --burnt-umber: #834625;
+    --guardsman-red: #c4020a;
+    --oil: #251d15;
+    --copper: #be6e3f;
+    --bulgarian-rose: #4d0c08;
+    --cement: #907a65;
+    --shingle-fawn: #765036;
+    --tan: #d1b386;
+    --soft-amber: #d1c5b1;
+    --muddy-waters: #b9885c;
+
+    --text-dark: #251d15; /* primary dark text */
+    --text-secondary: #907a65; /* secondary text */
+    }
+    /* ===============================
+       TYPOGRAPHY STYLES
+       =============================== */
+      .font-main-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dark); }
+      .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
+      .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
+      .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
+
+    /* ===============================
+       GLOBAL PAGE STYLING
+       =============================== */
     body {
-      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+      margin: 0;
+      overflow-x: hidden;
+      background: linear-gradient(
+        135deg,
+        var(--bulgarian-rose) 0%,
+        var(--tamarillo) 50%,
+        var(--copper) 100%
+      );
     }
 
-    .input-field {
-      transition: all 0.3s ease;
+    /* Subtle homepage radial pattern */
+    .bg-pattern {
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(210,179,134,0.05), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(190,110,63,0.05), transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(157,24,20,0.03), transparent 50%);
     }
+
+    /* ===============================
+       BACKGROUND STAR / SPRINKLE EFFECT
+       =============================== */
+    #sprinkle-rain {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      animation: twinkle 1.5s infinite alternate;
+      filter: drop-shadow(0 0 3px rgba(255,255,255,.7));
+    }
+
+    @keyframes twinkle {
+      from {opacity:.4;transform:scale(.85)}
+      to {opacity:.9;transform:scale(1.15)}
+    }
+
+    /* Inputs */
+    .input-field {
+      background: rgba(255,255,255,.15);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.25);
+      transition:.3s;
+    }
+
     .input-field:focus {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow:0 8px 24px rgba(0,0,0,.35);
     }
 
+    /* Swatches hover */
     .color-swatch {
-      transition: transform 0.3s ease;
+      transition:.3s;
+      border-radius:9999px;
     }
     .color-swatch:hover {
-      transform: scale(1.1);
+      transform:scale(1.15);
+      box-shadow:0 0 20px rgba(210,179,134,.6);
     }
+
 
     .recommendation-card {
-      animation: slideIn 0.5s ease-out;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(16px);
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .recommendation-card > div:nth-child(2) {
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255,255,255,0.4),
+        transparent
+      );
     }
 
+    /* Button */
     .submit-btn {
-      transition: all 0.3s ease;
+      background:linear-gradient(135deg,#9e1814,#be6e3f);
+      color:#fff;
+      transition:.3s;
     }
     .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-    }
-    .submit-btn:active {
-      transform: translateY(0);
+      transform:translateY(-3px);
+      box-shadow:0 12px 30px rgba(0,0,0,.5);
     }
 
-    @view-transition { navigation: auto; }
   </style>
 </head>
 
-<body class="h-full">
+<body class="h-full bg-pattern">
 
-  <!-- App Wrapper -->
-  <div id="app-wrapper" class="h-full w-full overflow-auto" 
-       style="background: linear-gradient(135deg, #6B5B95 0%, #B8A9C9 100%);">
-    <div class="min-h-full py-12 px-4">
-      <div class="max-w-4xl mx-auto">
+<!-- Stars -->
+<div id="sprinkle-rain"></div>
 
-        <!-- Header -->
-        <header class="text-center mb-10">
-          <h1 id="app-title" class="text-5xl font-bold mb-3" style="color: #ffffff;">
-            Smart Outfit Advisor
-          </h1>
-          <p id="app-subtitle" class="text-xl mb-2" style="color: #e0e7ff;">
-            Expert color recommendations based on event, season & location
-          </p>
-          <p class="text-sm" style="color: #c7d2fe;">
-            Rule-based inference system for optimal color combinations
-          </p>
-        </header>
+<!-- App wrapper (NO background here) -->
+<div id="app-wrapper" class="relative min-h-screen z-20">
 
-        <!-- Form -->
-        <div id="form"></div>
+  <div class="py-8 px-5">
+    <div class="max-w-6xl mx-auto">
 
-        <!-- Results -->
-        <div id="results"></div>
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <h1 class="text-5xl font-bold text-black mb-3 font-main-title tracking-tight">
+          Whole Outfits Suggestions
+        </h1>
+        <p class="text-xl text-brown-100">
+          Expert color recommendations based on event, season & location
+        </p>
+        <p class="text-sm mb-2 text-black-200">
+          Rule-based inference system for optimal combinations
+        </p>
+      </header>
 
-      </div>
+    <!-- SINGLE PANEL CONTAINER -->
+    <div class="max-w-6xl mx-auto h-[80vh] bg-white/20 backdrop-blur-xl rounded-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
+
+      <!-- LEFT: FORM -->
+      <section class="w-full md:w-2/5 p-10 flex flex-col justify-center">
+        <div id="form" class="space-y-4 w-full max-w-xs mt-8 mb-8"></div>
+      </section>
+
+      <!-- DIVIDER -->
+      <div class="w-full md:w-px h-px md:h-auto bg-black/30 my-4 md:my-0"></div>
+
+      <!-- RIGHT: RESULTS -->
+      <section class="w-full md:w-3/5 p-3 flex flex-col overflow-y-auto">
+        <!-- TITLE -->
+        <h2 class="text-3xl font-bold text-center mb-2 font-card-title">
+          Your Personalized Outfit
+        </h2>
+
+        <!-- RESULTS -->
+        <div id="results" class="flex-1 overflow-y-auto hidden opacity-0 transition-opacity duration-500">
+          <div id="color-swatches" class="grid grid-cols-2 gap-4 mb-6"></div>
+          <div id="combinations-list"></div>
+        </div>
+      </section>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+  </div>
+</div>
+
     </div>
   </div>
+</div>
 
   <!-- Scripts -->
 <script>
@@ -196,26 +306,55 @@ function filterColorsByWeather(colors, weather) {
   return filtered.length ? filtered : colors;
 }
 
-// Map color names to hex codes
 function getColorCode(colorName) {
   const colorMap = {
-    "Navy Blue": "#001f3f","Charcoal Gray": "#36454f","Black": "#000000",
-    "White": "#ffffff","Light Blue": "#add8e6","Burgundy": "#800020",
-    "Pastel Pink": "#ffd1dc","Lavender": "#e6e6fa","Sage Green": "#9dc183",
-    "Dusty Blue": "#6a8caf","Gold": "#ffd700","Champagne": "#f7e7ce",
-    "Ivory": "#fffff0","Denim Blue": "#1560bd","Beige": "#f5f5dc",
-    "Olive Green": "#808000","Gray": "#808080","Coral": "#ff7f50",
-    "Mustard": "#ffdb58","Deep Purple": "#301934","Forest Green": "#228b22",
-    "Rose Gold": "#b76e79","Blush Pink": "#fe828c","Cream": "#fffdd0",
-    "Royal Blue": "#4169e1","Emerald Green": "#50c878","Ruby Red": "#e0115f",
-    "Silver": "#c0c0c0","Hot Pink": "#ff69b4","Dark Gray": "#a9a9a9",
-    "Muted Blue": "#5b7c99","Khaki": "#c3b091","Earth Brown": "#654321",
-    "Orange": "#ffa500","Yellow": "#ffff00","Mint Green": "#98ff98",
-    "Sky Blue": "#87ceeb","Turquoise": "#40e0d0","Aqua": "#00ffff",
-    "Brown": "#a52a2a","Rust": "#b7410e","Midnight Blue": "#191970"
+    "Peach": "#ffd1b3",
+    "Navy Blue": "#001f3f",
+    "Charcoal Gray": "#36454f",
+    "Black": "#000000",
+    "White": "#ffffff",
+    "Light Blue": "#add8e6",
+    "Burgundy": "#800020",
+    "Pastel Pink": "#ffd1dc",
+    "Lavender": "#e6e6fa",
+    "Sage Green": "#9dc183",
+    "Dusty Blue": "#6a8caf",
+    "Gold": "#ffd700",
+    "Champagne": "#f7e7ce",
+    "Ivory": "#fffff0",
+    "Denim Blue": "#1560bd",
+    "Beige": "#f5f5dc",
+    "Olive Green": "#808000",
+    "Gray": "#808080",
+    "Coral": "#ff7f50",
+    "Mustard": "#ffdb58",
+    "Deep Purple": "#301934",
+    "Forest Green": "#228b22",
+    "Rose Gold": "#b76e79",
+    "Blush Pink": "#fe828c",
+    "Cream": "#fffdd0",
+    "Royal Blue": "#4169e1",
+    "Emerald Green": "#50c878",
+    "Ruby Red": "#e0115f",
+    "Silver": "#c0c0c0",
+    "Hot Pink": "#ff69b4",
+    "Dark Gray": "#a9a9a9",
+    "Muted Blue": "#5b7c99",
+    "Khaki": "#c3b091",
+    "Earth Brown": "#654321",
+    "Orange": "#ffa500",
+    "Yellow": "#ffff00",
+    "Mint Green": "#98ff98",
+    "Sky Blue": "#87ceeb",
+    "Turquoise": "#40e0d0",
+    "Aqua": "#00ffff",
+    "Brown": "#a52a2a",
+    "Rust": "#b7410e",
+    "Midnight Blue": "#191970"
   };
   return colorMap[colorName] || "#cccccc";
 }
+
 
 /***********************
  * RULE MATCHING
@@ -243,54 +382,55 @@ function getColorCode(colorName) {
 
     return palette.length > 0 ? palette : colors;
 }
-
-function runExpertSystem(userInput) {
-    let bestRule = null;
-    let highestScore = 0;
-
-    rules.forEach(rule => {
-        let score = 0;
-        const keys = Object.keys(rule.input);
-
-        keys.forEach(key => {
-            if (userInput[key]) {
-                // Handle array inputs (like gender)
-                if (Array.isArray(rule.input[key])) {
-                    if (rule.input[key].includes(userInput[key])) score += 2;
-                } else if (userInput[key] === rule.input[key]) {
-                    score += 2;
-                }
-            }
-
-            // Optional fields boost score
-            if ((key === "location_type" || key === "event_theme") && userInput[key] === rule.input[key]) {
-                score += 1;
-            }
-        });
-
-        if (score > highestScore) {
-            highestScore = score;
-            bestRule = rule;
-        }
-    });
-
-    if (!bestRule) {
-    showNotification("No Rules Match");
-    return;
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
 }
+function runExpertSystem(userInput) {
+  // Step 1: Filter rules by mandatory fields
+  let matchedRules = rules.filter(rule =>
+    rule.gender === userInput.gender &&
+    rule.event_type === userInput.event_type &&
+    rule.weather === userInput.weather
+  );
 
-    // Apply theme + weather color filtering
-    const filteredColors = filterColorsByWeatherAndTheme(
-        bestRule.output.color,
-        userInput.event_theme,
-        userInput.weather
-    );
+  if (!matchedRules.length) return null;
 
-    return {
-        preference_top: bestRule.output.preference_top || "T-shirt",
-        preference_bottom: bestRule.output.preference_bottom || "Jeans",
-        color: filteredColors
-    };
+  // Step 2: Adjust top/bottom options based on location
+  let tops = [];
+  let bottoms = [];
+  matchedRules.forEach(rule => {
+    if (userInput.location_type) {
+      if (["indoor","office","classroom","hall"].includes(userInput.location_type.toLowerCase())) {
+        tops.push(...rule.top_options.filter(t => !["T-shirt","Crop top"].includes(t))); // prefer formal
+        bottoms.push(...rule.bottom_options.filter(b => !["Jeans","Palazzo"].includes(b)));
+      } else if (["outdoor","park"].includes(userInput.location_type.toLowerCase())) {
+        tops.push(...rule.top_options);
+        bottoms.push(...rule.bottom_options);
+      }
+    } else {
+      tops.push(...rule.top_options);
+      bottoms.push(...rule.bottom_options);
+    }
+  });
+
+  tops = shuffle([...new Set(tops)]).slice(0,2);
+  bottoms = shuffle([...new Set(bottoms)]).slice(0,2);
+
+  // Step 3: Filter colors based on weather + theme
+  let colors = [];
+  matchedRules.forEach(rule => {
+    colors.push(...rule.color);
+  });
+
+  colors = [...new Set(colors)]; // remove duplicates
+
+  if (userInput.event_theme) {
+    colors = filterColorsByWeatherAndTheme(colors, userInput.event_theme, userInput.weather);
+  } else {
+    colors = filterColorsByWeather(colors, userInput.weather);
+  }
+
+  return { tops, bottoms, color: shuffle(colors).slice(0,4) };
 }
 
 /***********************
@@ -312,6 +452,8 @@ async function load(id, file) {
 function handleFormSubmit(e) {
   e.preventDefault();
 
+  const results = document.getElementById('results');
+
   let userInput = {
     event_type: document.getElementById('event-type')?.value,
     weather: document.getElementById('weather')?.value,
@@ -330,7 +472,6 @@ if (!userInput.gender || !userInput.event_type || !userInput.weather) {
     return;
 }
 
-
   const result = runExpertSystem(userInput);
 
   if (!result) {
@@ -339,40 +480,65 @@ if (!userInput.gender || !userInput.event_type || !userInput.weather) {
   }
 
   displayRuleResult(result);
+
+  // 🔹 Show results smoothly
+  results.classList.remove('hidden');
+  setTimeout(() => {
+    results.style.opacity = 1;
+  }, 50);
 }
 
 /***********************
  * DISPLAY RESULTS
  ***********************/
 function displayRuleResult(result) {
-  document.getElementById('reasoning-text').textContent =
-    "Recommendation generated using rule-based expert system.";
-
   document.getElementById('color-swatches').innerHTML =
-    result.color.map(c => `
-      <div class="text-center">
-        <div class="w-full h-24 rounded-xl mb-2" style="background:${getColorCode(c)}"></div>
-        <p>${c}</p>
+  result.color.slice(0, 4).map(c => `
+    <div class="text-center">
+      <div 
+        class="w-full h-20 rounded-xl mb-2 border border-gray-400"
+        style="background:${getColorCode(c)}">
       </div>
-    `).join('');
+      <p class="text-sm">${c}</p>
+    </div>
+  `).join('');
 
- document.getElementById('combinations-list').innerHTML = `
-  <div class="grid grid-cols-2 gap-4">
-    <div class="text-center">
-      <img src="/images/tops/${result.preference_top.toLowerCase().replace(/\s/g,'_')}.jpg" 
-           alt="${result.preference_top}" 
-            class="w-full max-h-48 object-contain rounded-xl mb-2">
-      <p class="font-semibold">${result.preference_top}</p>
+
+document.getElementById('combinations-list').innerHTML = `
+  <div class="space-y-6">
+
+    <!-- TOPS -->
+    <div>
+      <h4 class="font-semibold text-center mb-3">Top Wear</h4>
+      <div class="grid grid-cols-2 gap-4">
+        ${result.tops.map(top => `
+          <div class="text-center">
+            <img 
+              src="/images/tops/${top.toLowerCase().replace(/\s/g,'_')}.jpg"
+              class="w-full max-h-40 object-contain rounded-xl mb-2">
+            <p class="text-sm font-medium">${top}</p>
+          </div>
+        `).join('')}
+      </div>
     </div>
-    <div class="text-center">
-      <img src="/images/bottoms/${result.preference_bottom.toLowerCase().replace(/\s/g,'_')}.jpg" 
-           alt="${result.preference_bottom}" 
-            class="w-full max-h-48 object-contain rounded-xl mb-2">
-      <p class="font-semibold">${result.preference_bottom}</p>
+
+    <!-- BOTTOMS -->
+    <div>
+      <h4 class="font-semibold text-center mb-3">Bottom Wear</h4>
+      <div class="grid grid-cols-2 gap-4">
+        ${result.bottoms.map(bottom => `
+          <div class="text-center">
+            <img 
+              src="/images/bottoms/${bottom.toLowerCase().replace(/\s/g,'_')}.jpg"
+              class="w-full max-h-40 object-contain rounded-xl mb-2">
+            <p class="text-sm font-medium">${bottom}</p>
+          </div>
+        `).join('')}
+      </div>
     </div>
+
   </div>
 `;
-
 
   document.getElementById('results-section').style.display = "block";
 }
@@ -414,6 +580,81 @@ async function initApp() {
     console.error("Form not found! Ensure parts/form.html has id='outfit-form'");
   }
 }
+
+  /* ===============================
+     STAR RAIN JAVASCRIPT LOGIC
+     =============================== */
+  document.addEventListener('DOMContentLoaded', () => {
+  /* Container that holds all falling stars */
+  const container = document.getElementById('sprinkle-rain');
+  
+  /* Color and shape variations for visual diversity */
+  const colors = ['#FFFFFF','#d1c5b1','#d1b386','#be6e3f','#b9885c'];
+  const shapes = ['✦','✧','★','✶','✴','✷'];
+  
+  /* Track active stars for cleanup */
+  const activeStars = [];
+
+    /* ===============================
+     FUNCTION: CREATE A SINGLE STAR
+     =============================== */
+  function createStar() {
+    const star = document.createElement('div');
+    star.className = 'star';
+
+    /* Randomized visual properties */
+    const size = Math.random() * 14 + 10;
+    const left = Math.random() * window.innerWidth;
+    const duration = Math.random() * 3000 + 2000;
+    const delay = Math.random() * 1000;
+    const shape = shapes[Math.floor(Math.random()*shapes.length)];
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const floatSpeed = Math.random() * 2 + 1;
+    const baseOpacity = Math.random() * 0.4 + 0.3;
+
+    /* Apply star styles */
+    star.innerHTML = shape;
+    star.style.fontSize = size+'px';
+    star.style.left = left+'px';
+    star.style.top = '-30px';
+    star.style.color = color;
+    star.style.opacity = baseOpacity;
+    star.style.animation = `twinkle ${duration}ms infinite alternate, float ${floatSpeed}s infinite ease-in-out`;
+    star.style.animationDelay = `${delay}ms`;
+
+    container.appendChild(star);
+    activeStars.push({el: star, baseOpacity});
+
+       /* ===============================
+       FALLING ANIMATION (MANUAL)
+       =============================== */
+    const startTime = Date.now();
+    const fallDuration = Math.random() * 5000 + 8000;
+    const startY = -30;
+    const endY = window.innerHeight + 30;
+
+    function animateFall() {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / fallDuration, 1);
+      const currentY = startY + progress * (endY - startY);
+      star.style.top = currentY + 'px';
+      
+      if (progress > 0.8) star.style.opacity = baseOpacity * (1 - (progress - 0.8)*5);
+      if (progress < 1) requestAnimationFrame(animateFall);
+      else {
+        const index = activeStars.findIndex(s => s.el === star);
+        if(index > -1) activeStars.splice(index,1);
+        star.remove();
+      }
+    }
+
+    requestAnimationFrame(animateFall);
+  }
+
+  for(let i=0;i<20;i++) setTimeout(()=>createStar(),i*100);
+  const interval = setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
+  window.addEventListener('beforeunload',()=>{clearInterval(interval); activeStars.forEach(s=>s.el.remove());});
+});
 
 // Start app
 initApp();

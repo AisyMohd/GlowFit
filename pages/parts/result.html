@@ -1,22 +1,60 @@
-<div id="results-section" style="display: none;">
-  <div class="recommendation-card rounded-3xl p-8 shadow-2xl" style="background-color: #ffffff;">
-    <h2 class="text-3xl font-bold mb-6 text-center" style="color: #1e293b;">Your Personalized Color Palette</h2>
-    
-    <!-- Reasoning -->
-    <p id="reasoning-text" class="mb-4 text-center text-slate-700"></p>
 
-    <div class="mb-8">
-      <h3 class="text-2xl font-bold mb-4" style="color: #1e293b;">Recommended Colors</h3>
-      <div id="color-swatches" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+<style>
+/* Result Card */
+.recommendation-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.12),
+    0 10px 20px rgba(0,0,0,0.08);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Color swatches */
+.color-swatch {
+  height: 56px;
+  border-radius: 0.75rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+/* Outfit card */
+.outfit-card {
+  background: #f9fafb;
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* ===============================
+       TYPOGRAPHY STYLES
+       =============================== */
+      .font-main-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dark); }
+      .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
+      .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
+      .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
+
+</style>
+
+<div id="results-section">
+    <div class="flex gap-8">
+      <div class="flex-1">
+        <h3 class=" font-card-title text-xl mb-4 text-center">
+          Recommended Colors
+        </h3>
+        <div id="color-swatches" class="grid grid-cols-2 gap-4"></div>
+      </div>
+
+      <div class="flex-1">
+        <h3 class="font-card-title text-xl mb-4 text-center">
+          Outfit Combinations
+        </h3>
+        <div id="combinations-list"></div>
+      </div>
     </div>
-
-    <div class="mb-6">
-      <h3 class="text-2xl font-bold mb-4" style="color: #1e293b;">Outfit Combinations</h3>
-      <div id="combinations-list" class="space-y-3"></div>
-    </div>
-
-    <button id="reset-btn" class="submit-btn w-full mt-8 py-3 rounded-xl font-bold text-lg" style="background-color: #8b5cf6; color: #ffffff;">
-      Try Another Combination
-    </button>
-  </div>
 </div>

@@ -1,428 +1,61 @@
 [
-  {
-    "input": {
-      "event_type": "going to class",
-      "event_theme": "academic",
-      "location_type": "classroom",
-      "gender": "girl"
-    },
-    "output": {
-      "preference_top": "Blouse",
-      "preference_bottom": "Slacks",
-      "color": ["Navy Blue", "Gray", "White"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "going to class",
-      "event_theme": "academic",
-      "location_type": "classroom",
-      "gender": "boy"
-    },
-    "output": {
-      "preference_top": "Shirt",
-      "preference_bottom": "Slacks",
-      "color": ["Navy Blue", "Gray", "White"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "going to class",
-      "event_theme": "casual",
-      "weather": "Hot",
-      "gender":["boy","girl"]
-    },
-    "output": {
-      "preference_top": "T-shirt",
-      "preference_bottom": "Jeans",
-      "color": ["Light Blue", "White", "Denim Blue"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "presentation",
-      "event_theme": "academic",
-      "weather": "Cloudy",
-      "gender":["boy"]
-    },
-    "output": {
-      "preference_top": "Collar shirt",
-      "preference_bottom": "Slacks",
-      "color": ["Muted Blue", "Gray", "Dark Gray"]
-    }
-  },
-   {
-    "input": {
-      "event_type": "presentation",
-      "event_theme": "academic",
-      "weather": "Cloudy",
-      "gender":["girl"]
-    },
-    "output": {
-      "preference_top": "Shirt",
-      "preference_bottom": "Slacks",
-      "color": ["Muted Blue", "Gray", "Dark Gray"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "presentation",
-      "event_theme": "formal",
-      "location_type": "indoor"
-    },
-    "output": {
-      "preference_top": "Dress shirt",
-      "preference_bottom": "Slacks",
-      "color": ["Navy Blue", "Black", "Charcoal Gray"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "meeting",
-      "event_theme": "formal",
-      "location_type": "office"
-    },
-    "output": {
-      "preference_top": "Dress shirt",
-      "preference_bottom": "Trousers",
-      "color": ["Black", "Charcoal Gray", "Midnight Blue"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "meeting",
-      "event_theme": "elegant",
-      "location_type": "indoor"
-    },
-    "output": {
-      "preference_top": "Blouse",
-      "preference_bottom": "Slacks",
-      "color": ["Burgundy", "Champagne", "Ivory"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "office",
-      "event_theme": "formal",
-      "location_type": "indoor"
-    },
-    "output": {
-      "preference_top": "Dress shirt",
-      "preference_bottom": "Trousers",
-      "color": ["White", "Black", "Charcoal Gray"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "going to class",
-      "event_theme": "academic",
-      "weather": "Rainy"
-    },
-    "output": {
-      "preference_top": "Knit top",
-      "preference_bottom": "Pants",
-      "color": ["Sage Green", "Beige", "Cream"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "presentation",
-      "event_theme": "casual",
-      "weather": "Sunny"
-    },
-    "output": {
-      "preference_top": "Blouse",
-      "preference_bottom": "Slacks",
-      "color": ["Navy Blue", "Earth Brown", "Beige"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "going to class",
-      "event_theme": "casual",
-      "weather": "Windy"
-    },
-    "output": {
-      "preference_top": "T-shirt",
-      "preference_bottom": "Jeans",
-      "color": ["Olive Green", "Denim Blue", "Cream"]
-    }
-  },
+  {"gender":"girl","weather":"Sunny","event_type":"going to class","top_options":["Blouse","Crop top"],"bottom_options":["Skirt","Palazzo"],"color":["Peach","Black","Pastel Pink","Light Blue"]},
+  {"gender":"girl","weather":"Hot","event_type":"going to class","top_options":["Blouse","Crop top"],"bottom_options":["Skirt","Palazzo"],"color":["Peach","Black","Pastel Pink","Pastel Pink"]},
+  {"gender":"girl","weather":"Cloudy","event_type":"going to class","top_options":["Blouse","Crop top"],"bottom_options":["Skirt","Palazzo"],"color":["Peach","Black","Pastel Pink","Gray"]},
+  {"gender":"girl","weather":"Rainy","event_type":"going to class","top_options":["Blouse","Crop top"],"bottom_options":["Skirt","Palazzo"],"color":["Peach","Black","Pastel Pink","Dark Gray"]},
+  {"gender":"girl","weather":"Windy","event_type":"going to class","top_options":["Blouse","Crop top"],"bottom_options":["Skirt","Palazzo"],"color":["Peach","Black","Pastel Pink","Mint Green"]},
 
-  {
-    "input": {
-      "event_type": "date",
-      "event_theme": "elegant",
-      "location_type": "indoor"
-    },
-    "output": {
-      "preference_top": "Dress",
-      "preference_bottom": "Skirt",
-      "color": ["Emerald Green", "Deep Purple", "Midnight Blue"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "date",
-      "event_theme": "casual",
-      "location_type": "outdoor"
-    },
-    "output": {
-      "preference_top": "T-shirt",
-      "preference_bottom": "Jeans",
-      "color": ["Mint Green", "Beige", "Sky Blue"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "date",
-      "event_theme": "cute",
-      "weather": "Sunny"
-    },
-    "output": {
-      "preference_top": "Knit top",
-      "preference_bottom": "Palazzo pants",
-      "color": ["Coral", "Peach", "Cream"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "date",
-      "event_theme": "cute",
-      "weather": "Cloudy"
-    },
-    "output": {
-      "preference_top": "Knit top",
-      "preference_bottom": "Skirt",
-      "color": ["Coral", "Cream", "Blush Pink"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "date",
-      "event_theme": "casual",
-      "weather": "Windy"
-    },
-    "output": {
-      "preference_top": "Sweater",
-      "preference_bottom": "Jeans",
-      "color": ["Olive Green", "Forest Green"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "date",
-      "weather": "Rainy",
-      "location_type": "indoor"
-    },
-    "output": {
-      "preference_top": "T-shirt",
-      "preference_bottom": "Jeans",
-      "color": ["Gray", "Dark Gray"]
-    }
-  },
+  {"gender":"girl","weather":"Sunny","event_type":"presentation","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Kain batik"],"color":["Peach","Black","Champagne","Light Blue"]},
+  {"gender":"girl","weather":"Hot","event_type":"presentation","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Kain batik"],"color":["Peach","Black","Champagne","Pastel Pink"]},
+  {"gender":"girl","weather":"Cloudy","event_type":"presentation","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Kain batik"],"color":["Peach","Black","Champagne","Gray"]},
+  {"gender":"girl","weather":"Rainy","event_type":"presentation","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Kain batik"],"color":["Peach","Black","Champagne","Dark Gray"]},
+  {"gender":"girl","weather":"Windy","event_type":"presentation","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Kain batik"],"color":["Peach","Black","Champagne","Mint Green"]},
 
-  {
-    "input": {
-      "event_type": "party",
-      "event_theme": "cute",
-      "location_type": "indoor"
-    },
-    "output": {
-      "preference_top": "Crop top",
-      "preference_bottom": "Skirt",
-      "color": ["Pastel Pink", "Lavender", "Blush Pink"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "party",
-      "event_theme": "elegant",
-      "location_type": "hall"
-    },
-    "output": {
-      "preference_top": "Dress",
-      "preference_bottom": "Palazzo pants",
-      "color": ["Emerald Green", "Gold", "Midnight Blue"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "party",
-      "weather": "Hot"
-    },
-    "output": {
-      "preference_top": "Crop top",
-      "preference_bottom": "Skirt",
-      "color": ["Yellow", "Mint Green", "Ruby Red"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "party",
-      "event_theme": "elegant",
-      "weather": "Sunny"
-    },
-    "output": {
-      "preference_top": "Dress",
-      "preference_bottom": "Skirt",
-      "color": ["Emerald Green", "Gold", "Ivory"]
-    }
-  },
+  {"gender":"girl","weather":"Sunny","event_type":"meeting","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Skirt"],"color":["Peach","Black","Beige","Light Blue"]},
+  {"gender":"girl","weather":"Hot","event_type":"meeting","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Skirt"],"color":["Peach","Black","Beige","Pastel Pink"]},
+  {"gender":"girl","weather":"Cloudy","event_type":"meeting","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Skirt"],"color":["Peach","Black","Beige","Gray"]},
+  {"gender":"girl","weather":"Rainy","event_type":"meeting","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Skirt"],"color":["Peach","Black","Beige","Dark Gray"]},
+  {"gender":"girl","weather":"Windy","event_type":"meeting","top_options":["Blouse","Knit top"],"bottom_options":["Slacks","Skirt"],"color":["Peach","Black","Beige","Mint Green"]},
 
-  {
-    "input": {
-      "event_type": "casual outing",
-      "event_theme": "casual",
-      "weather": "Sunny"
-    },
-    "output": {
-      "preference_top": "T-shirt",
-      "preference_bottom": "Shorts",
-      "color": ["Mint Green", "White"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "casual outing",
-      "event_theme": "casual",
-      "weather": "Rainy"
-    },
-    "output": {
-      "preference_top": "Sweater",
-      "preference_bottom": "Cargo pants",
-      "color": ["Dark Gray", "Olive Green", "Brown"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "casual outing",
-      "event_theme": "sporty",
-      "weather": "Windy"
-    },
-    "output": {
-      "preference_top": "Sleeveless top",
-      "preference_bottom": "Jogger pants",
-      "color": ["Olive Green", "Khaki", "Forest Green"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "casual outing",
-      "location_type": "outdoor",
-      "weather": "Sunny"
-    },
-    "output": {
-      "preference_top": "Blouse",
-      "preference_bottom": "Skirt",
-      "color": ["Yellow", "Light Blue", "Ivory"]
-    }
-  },
+  {"gender":"girl","weather":"Sunny","event_type":"party","top_options":["Baju kebaya","Blouse"],"bottom_options":["Kain batik","Palazzo"],"color":["Peach","Black","Champagne","Light Blue"]},
+  {"gender":"girl","weather":"Hot","event_type":"party","top_options":["Baju kebaya","Blouse"],"bottom_options":["Kain batik","Palazzo"],"color":["Peach","Black","Champagne","Pastel Pink"]},
+  {"gender":"girl","weather":"Cloudy","event_type":"party","top_options":["Baju kebaya","Blouse"],"bottom_options":["Kain batik","Palazzo"],"color":["Peach","Black","Champagne","Gray"]},
+  {"gender":"girl","weather":"Rainy","event_type":"party","top_options":["Baju kebaya","Blouse"],"bottom_options":["Kain batik","Palazzo"],"color":["Peach","Black","Champagne","Dark Gray"]},
+  {"gender":"girl","weather":"Windy","event_type":"party","top_options":["Baju kebaya","Blouse"],"bottom_options":["Kain batik","Palazzo"],"color":["Peach","Black","Champagne","Mint Green"]},
 
-  {
-    "input": {
-      "event_type": "sports day",
-      "event_theme": "sporty",
-      "weather": "Hot"
-    },
-    "output": {
-      "preference_top": "Jersey",
-      "preference_bottom": "Shorts",
-      "color": ["Black", "White", "Coral"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "sports day",
-      "event_theme": "sporty",
-      "weather": "Sunny"
-    },
-    "output": {
-      "preference_top": "Jersey",
-      "preference_bottom": "Jogger pants",
-      "color": ["White", "Black", "Mint Green"]
-    }
-  },
-  {
-    "input": {
-      "event_theme": "sporty",
-      "weather": "Hot"
-    },
-    "output": {
-      "preference_top": "Sleeveless top",
-      "preference_bottom": "Shorts",
-      "color": ["Coral", "Black"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "casual outing",
-      "event_theme": "sporty",
-      "weather": "Rainy"
-    },
-    "output": {
-      "preference_top": "Jersey",
-      "preference_bottom": "Jogger pants",
-      "color": ["Aqua", "Dark Gray", "Muted Blue"]
-    }
-  },
+  {"gender":"girl","weather":"Sunny","event_type":"casual outing","top_options":["T-shirt","Crop top"],"bottom_options":["Jeans","Skirt"],"color":["Peach","Black","Denim Blue","Light Blue"]},
+  {"gender":"girl","weather":"Hot","event_type":"casual outing","top_options":["T-shirt","Crop top"],"bottom_options":["Jeans","Skirt"],"color":["Peach","Black","Denim Blue","Pastel Pink"]},
+  {"gender":"girl","weather":"Cloudy","event_type":"casual outing","top_options":["T-shirt","Crop top"],"bottom_options":["Jeans","Skirt"],"color":["Peach","Black","Denim Blue","Gray"]},
+  {"gender":"girl","weather":"Rainy","event_type":"casual outing","top_options":["T-shirt","Crop top"],"bottom_options":["Jeans","Skirt"],"color":["Peach","Black","Denim Blue","Dark Gray"]},
+  {"gender":"girl","weather":"Windy","event_type":"casual outing","top_options":["T-shirt","Crop top"],"bottom_options":["Jeans","Skirt"],"color":["Peach","Black","Denim Blue","Mint Green"]},
 
-  {
-    "input": {
-      "event_type": "wedding",
-      "event_theme": "elegant",
-      "location_type": "hall"
-    },
-    "output": {
-      "preference_top": "Baju kebaya",
-      "preference_bottom": "Kain batik",
-      "color": ["Champagne", "Gold", "Ivory"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "wedding",
-      "event_theme": "formal",
-      "location_type": "indoor"
-    },
-    "output": {
-      "preference_top": "Baju kurung",
-      "preference_bottom": "Skirt",
-      "color": ["Ivory", "Champagne", "Silver"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "wedding",
-      "event_theme": "elegant",
-      "location_type": "outdoor"
-    },
-    "output": {
-      "preference_top": "Baju melayu",
-      "color": ["Mint Green", "Sky Blue", "Turquoise"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "wedding",
-      "event_theme": "formal",
-      "weather": "Sunny"
-    },
-    "output": {
-      "preference_top": "Baju kurung",
-      "preference_bottom": "Skirt",
-      "color": ["Ivory", "Champagne", "Cream"]
-    }
-  },
-  {
-    "input": {
-      "event_type": "wedding",
-      "event_theme": "elegant"
-    },
-    "output": {
-      "preference_top": "Baju kebaya",
-      "preference_bottom": "Kain batik",
-      "color": ["Royal Blue", "Silver"]
-    }
-  }
+  {"gender":"boy","weather":"Sunny","event_type":"going to class","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Pastel Pink","Light Blue"]},
+  {"gender":"boy","weather":"Hot","event_type":"going to class","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Pastel Pink","Pastel Pink"]},
+  {"gender":"boy","weather":"Cloudy","event_type":"going to class","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Pastel Pink","Gray"]},
+  {"gender":"boy","weather":"Rainy","event_type":"going to class","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Pastel Pink","Dark Gray"]},
+  {"gender":"boy","weather":"Windy","event_type":"going to class","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Pastel Pink","Mint Green"]},
+
+  {"gender":"boy","weather":"Sunny","event_type":"presentation","top_options":["Collar shirt","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Light Blue"]},
+  {"gender":"boy","weather":"Hot","event_type":"presentation","top_options":["Collar shirt","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Pastel Pink"]},
+  {"gender":"boy","weather":"Cloudy","event_type":"presentation","top_options":["Collar shirt","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Gray"]},
+  {"gender":"boy","weather":"Rainy","event_type":"presentation","top_options":["Collar shirt","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Dark Gray"]},
+  {"gender":"boy","weather":"Windy","event_type":"presentation","top_options":["Collar shirt","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Mint Green"]},
+
+  {"gender":"boy","weather":"Sunny","event_type":"meeting","top_options":["Dress shirt","T-shirt"],"bottom_options":["Slacks","Jeans"],"color":["Peach","Black","Beige","Light Blue"]},
+  {"gender":"boy","weather":"Hot","event_type":"meeting","top_options":["Dress shirt","T-shirt"],"bottom_options":["Slacks","Jeans"],"color":["Peach","Black","Beige","Pastel Pink"]},
+  {"gender":"boy","weather":"Cloudy","event_type":"meeting","top_options":["Dress shirt","T-shirt"],"bottom_options":["Slacks","Jeans"],"color":["Peach","Black","Beige","Gray"]},
+  {"gender":"boy","weather":"Rainy","event_type":"meeting","top_options":["Dress shirt","T-shirt"],"bottom_options":["Slacks","Jeans"],"color":["Peach","Black","Beige","Dark Gray"]},
+  {"gender":"boy","weather":"Windy","event_type":"meeting","top_options":["Dress shirt","T-shirt"],"bottom_options":["Slacks","Jeans"],"color":["Peach","Black","Beige","Mint Green"]},
+
+  {"gender":"boy","weather":"Sunny","event_type":"party","top_options":["Baju melayu","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Light Blue"]},
+  {"gender":"boy","weather":"Hot","event_type":"party","top_options":["Baju melayu","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Pastel Pink"]},
+  {"gender":"boy","weather":"Cloudy","event_type":"party","top_options":["Baju melayu","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Gray"]},
+  {"gender":"boy","weather":"Rainy","event_type":"party","top_options":["Baju melayu","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Dark Gray"]},
+  {"gender":"boy","weather":"Windy","event_type":"party","top_options":["Baju melayu","Dress shirt"],"bottom_options":["Slacks","Trousers"],"color":["Peach","Black","Champagne","Mint Green"]},
+
+  {"gender":"boy","weather":"Sunny","event_type":"casual outing","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Denim Blue","Light Blue"]},
+  {"gender":"boy","weather":"Hot","event_type":"casual outing","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Denim Blue","Pastel Pink"]},
+  {"gender":"boy","weather":"Cloudy","event_type":"casual outing","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Denim Blue","Gray"]},
+  {"gender":"boy","weather":"Rainy","event_type":"casual outing","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Denim Blue","Dark Gray"]},
+  {"gender":"boy","weather":"Windy","event_type":"casual outing","top_options":["T-shirt","Dress shirt"],"bottom_options":["Jeans","Slacks"],"color":["Peach","Black","Denim Blue","Mint Green"]}
 ]
