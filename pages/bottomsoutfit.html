@@ -1,328 +1,511 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Outfit  Advisor</title>
-
-  <!-- SDKs -->
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-
-  <!-- TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Styles -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLOWFIT</title>
+<link rel="icon" type="image/png" href="/images/logo glowfit.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --tamarillo: #9e1814;
+    --burnt-umber: #834625;
+    --guardsman-red: #c4020a;
+    --oil: #251d15;
+    --copper: #be6e3f;
+    --bulgarian-rose: #4d0c08;
+    --cement: #907a65;
+    --shingle-fawn: #765036;
+    --tan: #d1b386;
+    --soft-amber: #d1c5b1;
+    --muddy-waters: #b9885c;
+
+    --text-dark: #251d15; /* primary dark text */
+    --text-secondary: #907a65; /* secondary text */
+    }
+    /* ===============================
+       TYPOGRAPHY STYLES
+       =============================== */
+      .font-main-title { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dark); }
+      .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
+      .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
+      .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
+
+    /* ===============================
+       GLOBAL PAGE STYLING
+       =============================== */
     body {
-      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+      margin: 0;
+      overflow-x: hidden;
+      background: linear-gradient(
+        135deg,
+        var(--bulgarian-rose) 0%,
+        var(--tamarillo) 50%,
+        var(--copper) 100%
+      );
     }
 
-    .input-field {
-      transition: all 0.3s ease;
+    /* Subtle homepage radial pattern */
+    .bg-pattern {
+      background-image:
+        radial-gradient(circle at 20% 80%, rgba(210,179,134,0.05), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(190,110,63,0.05), transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(157,24,20,0.03), transparent 50%);
     }
+
+    /* ===============================
+       BACKGROUND STAR / SPRINKLE EFFECT
+       =============================== */
+    #sprinkle-rain {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      animation: twinkle 1.5s infinite alternate;
+      filter: drop-shadow(0 0 3px rgba(255,255,255,.7));
+    }
+
+    @keyframes twinkle {
+      from {opacity:.4;transform:scale(.85)}
+      to {opacity:.9;transform:scale(1.15)}
+    }
+
+    /* Inputs */
+    .input-field {
+      background: rgba(255,255,255,.15);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.25);
+      transition:.3s;
+    }
+
     .input-field:focus {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow:0 8px 24px rgba(0,0,0,.35);
     }
 
+    /* Swatches hover */
     .color-swatch {
-      transition: transform 0.3s ease;
+      transition:.3s;
+      border-radius:9999px;
     }
     .color-swatch:hover {
-      transform: scale(1.1);
+      transform:scale(1.15);
+      box-shadow:0 0 20px rgba(210,179,134,.6);
     }
+
 
     .recommendation-card {
-      animation: slideIn 0.5s ease-out;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(16px);
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .recommendation-card > div:nth-child(2) {
+      background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255,255,255,0.4),
+        transparent
+      );
     }
 
+    /* Button */
     .submit-btn {
-      transition: all 0.3s ease;
+      background:linear-gradient(135deg,#9e1814,#be6e3f);
+      color:#fff;
+      transition:.3s;
     }
     .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-    }
-    .submit-btn:active {
-      transform: translateY(0);
+      transform:translateY(-3px);
+      box-shadow:0 12px 30px rgba(0,0,0,.5);
     }
 
-    @view-transition { navigation: auto; }
   </style>
 </head>
 
-<body class="h-full">
+<body class="h-full bg-pattern">
 
-  <!-- App Wrapper -->
-  <div id="app-wrapper" class="h-full w-full overflow-auto" 
-       style="background: linear-gradient(135deg, #6B5B95 0%, #B8A9C9 100%);">
-    <div class="min-h-full py-12 px-4">
-      <div class="max-w-4xl mx-auto">
+<!-- Stars -->
+<div id="sprinkle-rain"></div>
 
-        <!-- Header -->
-        <header class="text-center mb-10">
-          <h1 id="app-title" class="text-5xl font-bold mb-3" style="color: #ffffff;">
-            Bottom Suggestion
-          </h1>
-          <p id="app-subtitle" class="text-xl mb-2" style="color: #e0e7ff;">
-            Expert color recommendations based on event, season & location
-          </p>
-          <p class="text-sm" style="color: #c7d2fe;">
-            Rule-based inference system for optimal color combinations
-          </p>
-        </header>
+<!-- App wrapper (NO background here) -->
+<div id="app-wrapper" class="relative min-h-screen z-20">
 
-        <!-- Form -->
-        <div id="form"></div>
+  <div class="py-8 px-5">
+    <div class="max-w-6xl mx-auto">
 
-        <!-- Results -->
-        <div id="results"></div>
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <h1 class="text-5xl font-bold text-black mb-3 font-main-title tracking-tight">
+          Bottoms Outfits Suggestions
+        </h1>
+        <p class="text-xl text-brown-100">
+          Expert color recommendations based on event, season & location
+        </p>
+        <p class="text-sm mb-2 text-black-200">
+          Rule-based inference system for optimal combinations
+        </p>
+      </header>
 
-      </div>
+    <!-- SINGLE PANEL CONTAINER -->
+    <div class="max-w-6xl mx-auto h-[80vh] bg-white/20 backdrop-blur-xl rounded-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
+
+      <!-- LEFT: FORM -->
+      <section class="w-full md:w-2/5 p-10 flex flex-col justify-center">
+        <div id="form-container" class="space-y-4 w-full max-w-xs mt-8 mb-8"></div>
+      </section>
+
+      <!-- DIVIDER -->
+      <div class="w-full md:w-px h-px md:h-auto bg-black/30 my-4 md:my-0"></div>
+
+      <!-- RIGHT: RESULTS -->
+      <section class="w-full md:w-3/5 p-3 flex flex-col overflow-y-auto">
+        <!-- TITLE -->
+        <h2 class="text-3xl font-bold text-center mb-2 font-card-title">
+          Your Personalized Outfit
+        </h2>
+
+        <!-- RESULTS -->
+        <div id="result-container" class="flex-1 overflow-y-auto hidden opacity-0 transition-opacity duration-500">
+          <div id="color-swatches" class="grid grid-cols-2 gap-4 mb-6"></div>
+          <div id="combinations-list"></div>
+        </div>
+      </section>
+
+</div>
+
+
+</div>
+<!-- DEV DEBUG PANEL (VISIBLE FOR NOW) -->
+<div id="debug-panel"
+     class="mt-4 p-4 rounded-xl bg-black/70 text-green-200 text-xs font-mono max-h-64 overflow-y-auto">
+</div>
+
+
+</div>
+
+
+  </div>
+</div>
+
     </div>
   </div>
+</div>
 
   <!-- Scripts -->
 <script>
 /***********************
- * CONFIGURATION
+ * HELPER: LOAD HTML PARTS
  ***********************/
-const defaultConfig = {
-  // Background & Surfaces
-  background_color: "linear-gradient(135deg, #6B5B95 0%, #B8A9C9 100%)", // soft elegant gradient
-  surface_color: "#ffffff", // cards and forms
-  card_shadow: "0 8px 20px rgba(0,0,0,0.12)", // soft elegant shadow
-  card_border_radius: "1.5rem", // smooth rounded corners
+async function loadHTML(url, containerId){
+  try{
+    const res = await fetch(url);
+    const html = await res.text();
+    const container = document.getElementById(containerId);
+    if(container) container.innerHTML = html;
+  }catch(err){
+    console.error(`Failed to load ${url}`, err);
+  }
+}
 
-  // Text
-  text_color: "#1F2937", // dark slate for main text
-  secondary_text_color: "#6B7280", // soft gray for labels & hints
-  heading_color: "#111827", // strong elegant headings
-  font_family: "'Lora', serif", // elegant serif font for headings
-  body_font_family: "'Inter', sans-serif", // clean sans-serif for body text
-  font_size: 16,
-  heading_font_size: 24,
-
-  // Actions & Buttons
-  primary_action_color: "#6B5B95", // main button color
-  primary_action_hover: "#57457F",
-  secondary_action_color: "#B8A9C9",
-  secondary_action_hover: "#A48BB8",
-  button_border_radius: "1rem",
-  button_text_color: "#ffffff",
-
-  // App Info
-  app_title: "Smart Outfit Color Advisor",
-  app_subtitle: "Curated color recommendations for every occasion",
-  
-  // Form Labels
-  event_label: "Event Type",
-  season_label: "Season",
-  location_label: "Location",
-  gender_label: "Gender",
-  
-  // Buttons
-  button_text: "Get Recommendations",
-  reset_button_text: "Try Another Combination",
-
-  // Color swatches & outfit images
-  color_swatch_size: "6rem",
-  outfit_image_height: "12rem",
-  outfit_image_border_radius: "1rem",
+/***********************
+ * KNOWLEDGE BASE
+ ***********************/
+const KB = {
+  tops: [
+    "T-Shirt","Shirt","Blouse","Crop Top",
+    "Hoodie","Sweater","Tank Top","Long Sleeve Top"
+  ],
+  bottoms: ["Jeans","Palazzo Pants","Skirt","Shorts"],
+  colors: [
+    "Black","White","Pastel Pink","Lavender","Light Blue",
+    "Navy Blue","Gray","Emerald Green","Deep Purple",
+    "Ruby Red","Coral","Denim Blue","Blush Pink"
+  ],
+  themeColors:{
+    cute: ["Pastel Pink","Lavender","Blush Pink"],
+    formal: ["Black","White","Navy Blue"],
+    sporty: ["Black","White","Coral"],
+    academic: ["Navy Blue","Gray","White"],
+    elegant: ["Emerald Green","Deep Purple","Ruby Red"],
+    casual: ["Light Blue","White","Denim Blue"]
+  },
+  compatibleBottoms:{
+    "T-Shirt": ["Jeans","Shorts","Palazzo Pants"],
+    "Shirt": ["Jeans","Palazzo Pants"],
+    "Blouse": ["Jeans","Palazzo Pants","Skirt"],
+    "Crop Top": ["Palazzo Pants","Skirt","Shorts"],
+    "Hoodie": ["Jeans","Shorts"],
+    "Sweater": ["Jeans","Skirt"],
+    "Tank Top": ["Jeans","Shorts"],
+    "Long Sleeve Top": ["Jeans","Palazzo Pants","Skirt"]
+  }
 };
 
+/***********************
+ * GLOBAL STATE
+ ***********************/
+let filteredState = {
+  bottoms: [],
+  colors: [],
+  top: null
+};
 
 /***********************
- * RULES
+ * UTILITIES
  ***********************/
-let rules = [];
+const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
 
-// Load rules from JSON file
-async function loadRules() {
-  try {
-    const response = await fetch('js/rules.json');
-    rules = await response.json();
-    console.log("Rules loaded:", rules.length);
-  } catch (err) {
-    console.error("Failed to load rules:", err);
-  }
-}
-
-/***********************
- * COLOR MAP
- ***********************/
-function getColorCode(colorName) {
-  const colorMap = {
-    "Navy Blue": "#001f3f", "Charcoal Gray": "#36454f", "Black": "#000000",
-    "White": "#ffffff", "Light Blue": "#add8e6", "Burgundy": "#800020",
-    "Pastel Pink": "#ffd1dc", "Lavender": "#e6e6fa", "Sage Green": "#9dc183",
-    "Dusty Blue": "#6a8caf", "Gold": "#ffd700", "Champagne": "#f7e7ce",
-    "Ivory": "#fffff0", "Denim Blue": "#1560bd", "Beige": "#f5f5dc",
-    "Olive Green": "#808000", "Gray": "#808080", "Coral": "#ff7f50",
-    "Mustard": "#ffdb58", "Deep Purple": "#301934", "Forest Green": "#228b22",
-    "Rose Gold": "#b76e79", "Blush Pink": "#fe828c", "Cream": "#fffdd0",
-    "Royal Blue": "#4169e1", "Emerald Green": "#50c878", "Ruby Red": "#e0115f",
-    "Silver": "#c0c0c0", "Hot Pink": "#ff69b4", "Dark Gray": "#a9a9a9",
-    "Muted Blue": "#5b7c99", "Khaki": "#c3b091", "Earth Brown": "#654321",
-    "Orange": "#ffa500", "Yellow": "#ffff00", "Mint Green": "#98ff98",
-    "Sky Blue": "#87ceeb", "Turquoise": "#40e0d0", "Aqua": "#00ffff",
-    "Brown": "#a52a2a", "Rust": "#b7410e", "Midnight Blue": "#191970"
+function getColorCode(name){
+  const map = {
+    Black:"#000", White:"#fff", Gray:"#808080",
+    "Pastel Pink":"#ffd1dc", Lavender:"#e6e6fa",
+    "Light Blue":"#add8e6", "Navy Blue":"#001f3f",
+    "Emerald Green":"#50c878", "Deep Purple":"#673ab7",
+    "Ruby Red":"#9b111e", Coral:"#ff7f50",
+    "Denim Blue":"#1560bd", "Blush Pink":"#f9c0c0"
   };
-  return colorMap[colorName] || "#cccccc";
+  return map[name] || "#ccc";
 }
 
-/***********************
- * RULE MATCHING
- ***********************/
-function runExpertSystem(userInput) {
-  let bestRule = null;
-  let highestScore = 0;
-
-  rules.forEach(rule => {
-    let score = 0;
-    let ruleKeys = Object.keys(rule.input);
-
-    ruleKeys.forEach(key => {
-      if (userInput[key] && userInput[key] === rule.input[key]) {
-        score++;
-      }
-    });
-
-    // Rule must match at least 1 condition
-    if (score > highestScore) {
-      highestScore = score;
-      bestRule = rule;
-    }
+function showNotification(msg){
+  const n = document.createElement('div');
+  n.textContent = msg;
+  Object.assign(n.style,{
+    position:"fixed",top:"20px",right:"20px",
+    background:"#ef4444",color:"#fff",
+    padding:"16px 24px",borderRadius:"12px",
+    zIndex:1000
   });
-
-  return highestScore > 0 ? bestRule.output : null;
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(),3000);
 }
 
 /***********************
- * LOAD HTML PARTIALS
+ * RULE ENGINE
  ***********************/
-async function load(id, file) {
-  try {
-    const res = await fetch(file);
-    const html = await res.text();
-    document.getElementById(id).innerHTML = html;
-  } catch (err) {
-    console.error(`Failed to load ${file}:`, err);
+function applyRules(user){
+  let bottoms = [...KB.bottoms];
+  let colors = [...KB.colors];
+
+  // WEATHER
+  if(user.weather === "Hot"){
+    colors = colors.filter(c=>!["Black","Gray"].includes(c));
   }
-}
+  if(user.weather === "Rainy"){
+    colors = colors.filter(c=>!["White","Pastel Pink"].includes(c));
+  }
 
-/***********************
- * FORM HANDLER
- ***********************/
-function handleFormSubmit(e) {
-  e.preventDefault();
+  // LOCATION
+  if(["indoor","office","classroom","hall"].includes(user.location_type)){
+    bottoms = bottoms.filter(b=>b!=="Shorts");
+  }
 
-  let userInput = {
-    event_type: document.getElementById('event-type')?.value,
-    weather: document.getElementById('weather')?.value,
-    location_type: document.getElementById('location')?.value,
-    event_theme: document.getElementById('event-theme')?.value,
-    gender: document.getElementById('gender')?.value
+  // GENDER
+  if(["male","boy"].includes(user.gender)){
+    bottoms = bottoms.filter(b=>b!=="Skirt");
+  }
+
+  // THEME
+  if(user.event_theme && KB.themeColors[user.event_theme]){
+    colors = colors.filter(c=>KB.themeColors[user.event_theme].includes(c));
+  }
+
+  // TOP → BOTTOM COMPATIBILITY (CORRECT)
+  if(user.top && KB.compatibleBottoms[user.top]){
+    bottoms = bottoms.filter(b =>
+      KB.compatibleBottoms[user.top].includes(b)
+    );
+  }
+
+  filteredState = { bottoms, colors, top: user.top };
+
+  return {
+    top: user.top,
+    bottoms: shuffle(bottoms).slice(0,2),
+    colors: shuffle(colors).slice(0,4)
   };
+}
+/***********************
+ * DEBUG PANEL (BOTTOM LOGIC)
+ ***********************/
+function renderDebugInfo(bottoms, selectedTop, colors, user){
+  const panel = document.getElementById('debug-panel');
+  if(!panel) return;
 
-  // Remove empty fields
-  userInput = Object.fromEntries(
-    Object.entries(userInput).filter(([_, v]) => v && v !== "")
-  );
+  panel.innerHTML = `
+    <div class="text-green-400 font-bold mb-2">
+      [DEV MODE] Bottom Rule Evaluation
+    </div>
 
-  const result = runExpertSystem(userInput);
+    <div class="mb-3 text-yellow-300 leading-relaxed">
+      <b>Gender:</b> ${user.gender}<br>
+      <b>Weather:</b> ${user.weather}<br>
+      <b>Location:</b> ${user.location_type || "—"}<br>
+      <b>Theme:</b> ${user.event_theme || "—"}<br>
+      <b>Selected Top:</b> ${selectedTop || "—"}
+    </div>
 
-  if (!result) {
-    showNotification("No matching outfit rule found");
-    return;
-  }
+    <div class="mb-3">
+      <b class="text-green-300">Compatible Bottoms</b><br>
+      ${bottoms.length ? bottoms.join("<br>") : "<span class='text-red-400'>NONE</span>"}
+    </div>
 
-  displayRuleResult(result);
+    <div>
+      <b class="text-green-300">Available Colors</b><br>
+      ${colors.length ? colors.join("<br>") : "<span class='text-red-400'>NONE</span>"}
+    </div>
+  `;
+
+  panel.classList.remove('hidden');
 }
 
 /***********************
  * DISPLAY RESULTS
  ***********************/
-function displayRuleResult(result) {
-  document.getElementById('reasoning-text').textContent =
-    "Recommendation generated using rule-based expert system.";
+function displayRuleResult(result){
+  const section = document.getElementById('result-container');
+  const swatches = document.getElementById('color-swatches');
+  const combos = document.getElementById('combinations-list');
+  if(!section || !swatches || !combos) return;
 
-  document.getElementById('color-swatches').innerHTML =
-    result.color.map(c => `
-      <div class="text-center">
-        <div class="w-full h-24 rounded-xl mb-2" style="background:${getColorCode(c)}"></div>
-        <p>${c}</p>
+  swatches.innerHTML = result.colors.map(c=>`
+    <div class="text-center">
+      <div class="w-10 h-10 mx-auto rounded-full" style="background:${getColorCode(c)}"></div>
+      <p class="text-sm">${c}</p>
+    </div>
+  `).join("");
+
+  combos.innerHTML = `
+    <div class="mb-6">
+      <h4 class="text-center font-semibold mb-3">Your Top</h4>
+      <p class="text-center">${result.top}</p>
+    </div>
+
+    <div>
+      <h4 class="text-center font-semibold mb-3">Recommended Bottoms</h4>
+      <div class="grid grid-cols-2 gap-4">
+        ${result.bottoms.map(b=>`
+          <div class="text-center">
+            <img src="/images/bottoms/${b.toLowerCase().replace(/\s/g,'_')}.jpg"
+                 class="w-full max-h-40 object-contain rounded-xl mb-2">
+            <p>${b}</p>
+          </div>
+        `).join("")}
       </div>
-    `).join('');
-
- document.getElementById('combinations-list').innerHTML = `
-  <div class="grid grid-cols-2 gap-4">
-    <div class="text-center">
-      <img src="/images/tops/${result.preference_top.toLowerCase().replace(/\s/g,'_')}.jpg" 
-           alt="${result.preference_top}" 
-            class="w-full max-h-48 object-contain rounded-xl mb-2">
-      <p class="font-semibold">${result.preference_top}</p>
     </div>
-    <div class="text-center">
-      <img src="/images/bottoms/${result.preference_bottom.toLowerCase().replace(/\s/g,'_')}.jpg" 
-           alt="${result.preference_bottom}" 
-            class="w-full max-h-48 object-contain rounded-xl mb-2">
-      <p class="font-semibold">${result.preference_bottom}</p>
-    </div>
-  </div>
-`;
-
-
-  document.getElementById('results-section').style.display = "block";
-}
-
-/***********************
- * NOTIFICATION
- ***********************/
-function showNotification(message) {
-  const notification = document.createElement('div');
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #ef4444;
-    color: white;
-    padding: 16px 24px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
   `;
-  document.body.appendChild(notification);
-  setTimeout(() => notification.remove(), 3000);
+
+  section.classList.remove("hidden","opacity-0");
 }
 
 /***********************
- * INITIALIZE APP
+ * FORM HANDLER
  ***********************/
-async function initApp() {
-  await loadRules();
-  await load("form", "parts/formbottom.html");
-  await load("results", "parts/result.html");
+function handleFormSubmit(e){
+  e.preventDefault();
 
-  const form = document.getElementById('bottom-form');
-  if (form) {
-    form.addEventListener('submit', handleFormSubmit);
-  } else {
-    console.error("Form not found! Ensure parts/form.html has id='outfit-form'");
+  const user = {
+    gender: document.getElementById('gender')?.value,
+    weather: document.getElementById('weather')?.value,
+    location_type: document.getElementById('location')?.value,
+    event_theme: document.getElementById('event-theme')?.value,
+    event_type: document.getElementById('event-type')?.value,
+    top: document.getElementById('user-top')?.value
+  };
+
+  if(!user.gender || !user.weather || !user.event_type || !user.top){
+    showNotification("Please fill Gender, Weather, Event Type and Top.");
+    return;
   }
+
+  // 👉 APPLY RULES ONCE
+  const result = applyRules(user);
+
+  // 👉 SHOW RESULTS
+  displayRuleResult(result);
+
+  // 👉 SHOW DEBUG (THIS WAS MISSING)
+  renderDebugInfo(
+    filteredState.bottoms, // FULL compatible bottoms
+    user.top,
+    filteredState.colors,
+    user
+  );
 }
 
-// Start app
-initApp();
+/***********************
+ * RE-PICK
+ ***********************/
+function pickOtherCombination(){
+  if(!filteredState.bottoms.length){
+    showNotification("Submit the form first!");
+    return;
+  }
+
+  displayRuleResult({
+    top: filteredState.top,
+    bottoms: shuffle(filteredState.bottoms).slice(0,2),
+    colors: shuffle(filteredState.colors).slice(0,4)
+  });
+}
+/***********************
+ * STAR RAIN EFFECT
+ ***********************/
+function initStarRain(){
+  const container = document.getElementById('sprinkle-rain');
+  if(!container) return;
+  const colors = ['#FFFFFF','#d1c5b1','#d1b386','#be6e3f','#b9885c'];
+  const shapes = ['✦','✧','★','✶','✴','✷'];
+
+  function createStar(){
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size=Math.random()*14+10, left=Math.random()*window.innerWidth;
+    const shape = shapes[Math.floor(Math.random()*shapes.length)];
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    star.style.fontSize = size+'px';
+    star.style.left = left+'px';
+    star.style.top = '-30px';
+    star.style.color = color;
+    star.innerHTML = shape;
+    container.appendChild(star);
+    const fallDuration = Math.random()*5000+8000;
+    const startTime = Date.now();
+    function fall(){ 
+      const progress=(Date.now()-startTime)/fallDuration; 
+      star.style.top = (-30 + progress*(window.innerHeight+60))+'px';
+      if(progress<1) requestAnimationFrame(fall);
+      else star.remove();
+    }
+    requestAnimationFrame(fall);
+  }
+
+  for(let i=0;i<20;i++) setTimeout(createStar,i*100);
+  setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
+}
+
+
+/***********************
+ * INIT
+ ***********************/
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await loadHTML('./parts/formbottom.html','form-container');
+  await loadHTML('./parts/result.html','result-container');
+
+  document.querySelector('#outfit-form')?.addEventListener('submit',handleFormSubmit);
+  document.querySelector('#pick-other-btn')?.addEventListener('click',pickOtherCombination);
+
+  initStarRain();
+});
 </script>
+
 
 
 </body>
