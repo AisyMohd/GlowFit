@@ -210,84 +210,88 @@
  * HELPER: LOAD HTML PARTS
  ***********************/
 async function loadHTML(url, containerId){
-  try{
+  try {
     const res = await fetch(url);
     const html = await res.text();
     const container = document.getElementById(containerId);
     if(container) container.innerHTML = html;
-  }catch(err){
-    console.error(`Failed to load ${url}`, err);
+    return container || null;
+  } catch(err){
+    console.error(`Failed to load ${url}:`, err);
+    return null;
   }
 }
 
 /***********************
- * KNOWLEDGE BASE
+ * CLOTHING OPTIONS
  ***********************/
-const KB = {
-  tops: [
-    "T-Shirt","Shirt","Blouse","Crop Top",
-    "Hoodie","Sweater","Tank Top","Long Sleeve Top"
-  ],
-  bottoms: ["Jeans","Palazzo Pants","Skirt","Shorts"],
-  colors: [
-    "Black","White","Pastel Pink","Lavender","Light Blue",
-    "Navy Blue","Gray","Emerald Green","Deep Purple",
-    "Ruby Red","Coral","Denim Blue","Blush Pink"
-  ],
-  themeColors:{
-    cute: ["Pastel Pink","Lavender","Blush Pink"],
-    formal: ["Black","White","Navy Blue"],
-    sporty: ["Black","White","Coral"],
-    academic: ["Navy Blue","Gray","White"],
-    elegant: ["Emerald Green","Deep Purple","Ruby Red"],
-    casual: ["Light Blue","White","Denim Blue"]
-  },
-  compatibleBottoms:{
-    "T-Shirt": ["Jeans","Shorts","Palazzo Pants"],
-    "Shirt": ["Jeans","Palazzo Pants"],
-    "Blouse": ["Jeans","Palazzo Pants","Skirt"],
-    "Crop Top": ["Palazzo Pants","Skirt","Shorts"],
-    "Hoodie": ["Jeans","Shorts"],
-    "Sweater": ["Jeans","Skirt"],
-    "Tank Top": ["Jeans","Shorts"],
-    "Long Sleeve Top": ["Jeans","Palazzo Pants","Skirt"]
-  }
-};
+const allTops = [
+  "T-Shirt","Blouse","Sleeveless Top","Crop Top","Knit Top","Sweater","Jersey",
+  "Pajama Top","Dress Shirt","Baju Kurung","Baju Melayu","Baju Kebaya",
+  "Collar Shirt","Dress"
+];
+
+const allBottoms = [
+  "Jeans","Trousers","Pants","Slacks","Cargo Pants","Jogger Pants",
+  "Sweatpants","Shorts","Skirt","Palazzo","Kain Batik","Kain Pelikat"
+];
+
+const allColors = [
+  "Navy Blue", "Charcoal Gray", "Black", "White", "Light Blue", "Burgundy",
+  "Pastel Pink", "Lavender", "Sage Green", "Dusty Blue", "Gold", "Champagne",
+  "Ivory", "Denim Blue", "Beige", "Olive Green", "Gray", "Coral", "Mustard",
+  "Deep Purple", "Forest Green", "Rose Gold", "Blush Pink", "Cream", "Royal Blue",
+  "Emerald Green", "Ruby Red", "Silver", "Hot Pink", "Dark Gray", "Muted Blue",
+  "Khaki", "Earth Brown", "Orange", "Yellow", "Mint Green", "Sky Blue", "Turquoise",
+  "Aqua", "Brown", "Rust", "Midnight Blue"
+];
+
+let filteredBottoms = [];
+let filteredTops = [];
+let filteredColors = [];
+let lastUserInput = null; // store last submitted form
 
 /***********************
- * GLOBAL STATE
+ * COLOR MAP
  ***********************/
-let filteredState = {
-  bottoms: [],
-  colors: [],
-  top: null
-};
+function getColorCode(name){
+  const map = {
+    "Navy Blue": "#001f3f","Charcoal Gray": "#36454f","Black": "#000000","White": "#ffffff",
+    "Light Blue": "#add8e6","Burgundy": "#800020","Pastel Pink": "#ffd1dc","Lavender": "#e6e6fa",
+    "Sage Green": "#9caf88","Dusty Blue": "#5d8aa8","Gold": "#ffd700","Champagne": "#f7e7ce",
+    "Ivory": "#fffff0","Denim Blue": "#1560bd","Beige": "#f5f5dc","Olive Green": "#708238",
+    "Gray": "#808080","Coral": "#ff7f50","Mustard": "#ffdb58","Deep Purple": "#673ab7",
+    "Forest Green": "#228b22","Rose Gold": "#b76e79","Blush Pink": "#f9c0c0","Cream": "#fffdd0",
+    "Royal Blue": "#4169e1","Emerald Green": "#50c878","Ruby Red": "#9b111e","Silver": "#c0c0c0",
+    "Hot Pink": "#ff69b4","Dark Gray": "#a9a9a9","Muted Blue": "#7393b3","Khaki": "#f0e68c",
+    "Earth Brown": "#a0522d","Orange": "#ffa500","Yellow": "#ffff00","Mint Green": "#98ff98",
+    "Sky Blue": "#87ceeb","Turquoise": "#40e0d0","Aqua": "#00ffff","Brown": "#8b4513",
+    "Rust": "#b7410e","Midnight Blue": "#191970"
+  };
+  return map[name] || "#ccc";
+}
 
 /***********************
  * UTILITIES
  ***********************/
-const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
 
-function getColorCode(name){
-  const map = {
-    Black:"#000", White:"#fff", Gray:"#808080",
-    "Pastel Pink":"#ffd1dc", Lavender:"#e6e6fa",
-    "Light Blue":"#add8e6", "Navy Blue":"#001f3f",
-    "Emerald Green":"#50c878", "Deep Purple":"#673ab7",
-    "Ruby Red":"#9b111e", Coral:"#ff7f50",
-    "Denim Blue":"#1560bd", "Blush Pink":"#f9c0c0"
+function getRandomSubset(bottoms, top, colors){
+  return {
+    bottoms: shuffle(bottoms).slice(0,2),
+    tops: [top],
+    color: shuffle(colors).slice(0,4)
   };
-  return map[name] || "#ccc";
 }
 
 function showNotification(msg){
   const n = document.createElement('div');
   n.textContent = msg;
   Object.assign(n.style,{
-    position:"fixed",top:"20px",right:"20px",
-    background:"#ef4444",color:"#fff",
-    padding:"16px 24px",borderRadius:"12px",
-    zIndex:1000
+    position:"fixed", top:"20px", right:"20px",
+    backgroundColor:"#ef4444", color:"#fff",
+    padding:"16px 24px", borderRadius:"12px",
+    boxShadow:"0 4px 12px rgba(0,0,0,0.2)", zIndex:1000
   });
   document.body.appendChild(n);
   setTimeout(()=>n.remove(),3000);
@@ -296,134 +300,137 @@ function showNotification(msg){
 /***********************
  * RULE ENGINE
  ***********************/
-function applyRules(user){
-  let bottoms = [...KB.bottoms];
-  let colors = [...KB.colors];
+function filterBottomsByRules(user){
+  let bottoms = [...allBottoms];
+  let tops = [...allTops];
+  let colors = [...allColors];
+  const chosenTop = user.top || tops[0]; // fallback
 
-  // WEATHER
-  if(user.weather === "Hot"){
-    colors = colors.filter(c=>!["Black","Gray"].includes(c));
-  }
-  if(user.weather === "Rainy"){
-    colors = colors.filter(c=>!["White","Pastel Pink"].includes(c));
-  }
+  // --- WEATHER ---
+  if(user.weather === "Hot") colors = colors.filter(c => !["Black","Dark Gray","Midnight Blue","Burgundy","Deep Purple","Ruby Red","Forest Green"].includes(c));
+  if(user.weather === "Rainy") colors = colors.filter(c => !["White","Pastel Pink","Lavender","Blush Pink","Cream","Ivory","Champagne"].includes(c));
+  if(user.weather === "Windy") colors = colors.filter(c => ["Earth Brown","Olive Green","Khaki","Muted Blue","Sage Green","Dusty Blue"].includes(c));
 
-  // LOCATION
+  // --- LOCATION ---
   if(["indoor","office","classroom","hall"].includes(user.location_type)){
-    bottoms = bottoms.filter(b=>b!=="Shorts");
+    tops = tops.filter(t => !["T-Shirt","Crop Top","Pajama Top","Jersey"].includes(t));
+    bottoms = bottoms.filter(b => !["Jeans","Shorts","Jogger Pants","Sweatpants"].includes(b));
   }
 
-  // GENDER
+  // --- GENDER ---
   if(["male","boy"].includes(user.gender)){
-    bottoms = bottoms.filter(b=>b!=="Skirt");
+    tops = tops.filter(t => !["Crop Top","Blouse","Dress","Baju Kurung","Baju Kebaya"].includes(t));
+    bottoms = bottoms.filter(b => !["Skirt","Palazzo","Kain Batik"].includes(b));
+  }
+  if(["female","girl"].includes(user.gender)){
+    tops = tops.filter(t => !["Baju Melayu","Collar Shirt"].includes(t));
+    bottoms = bottoms.filter(b => !["Jogger Pants","Sweatpants","Kain Pelikat","Shorts","Palazzo"].includes(b));
   }
 
-  // THEME
-  if(user.event_theme && KB.themeColors[user.event_theme]){
-    colors = colors.filter(c=>KB.themeColors[user.event_theme].includes(c));
-  }
-
-  // TOP → BOTTOM COMPATIBILITY (CORRECT)
-  if(user.top && KB.compatibleBottoms[user.top]){
-    bottoms = bottoms.filter(b =>
-      KB.compatibleBottoms[user.top].includes(b)
-    );
-  }
-
-  filteredState = { bottoms, colors, top: user.top };
-
-  return {
-    top: user.top,
-    bottoms: shuffle(bottoms).slice(0,2),
-    colors: shuffle(colors).slice(0,4)
+  // --- EVENT TYPE ---
+  const eventRestrictions = {
+    "going to class": { tops:["Crop Top","Pajama Top"], bottoms:["Kain Batik","Kain Pelikat","Palazzo","Shorts"] },
+    "office": { tops:["T-Shirt","Crop Top","Pajama Top"], bottoms:["Shorts","Jogger Pants","Sweatpants"] },
+    "party": { tops:["Pajama Top"], bottoms:["Sweatpants"] },
+    "sport": { tops:["Blouse","Baju Kurung","Dress Shirt"], bottoms:["Skirt","Palazzo","Kain Batik"] }
   };
-}
-/***********************
- * DEBUG PANEL (BOTTOM LOGIC)
- ***********************/
-function renderDebugInfo(bottoms, selectedTop, colors, user){
-  const panel = document.getElementById('debug-panel');
-  if(!panel) return;
+  if(user.event_type && eventRestrictions[user.event_type]){
+    const r = eventRestrictions[user.event_type];
+    if(r.tops) tops = tops.filter(t => !r.tops.includes(t));
+    if(r.bottoms) bottoms = bottoms.filter(b => !r.bottoms.includes(b));
+  }
 
-  panel.innerHTML = `
-    <div class="text-green-400 font-bold mb-2">
-      [DEV MODE] Bottom Rule Evaluation
-    </div>
+  // --- THEME COLORS ---
+  const themeColors = {
+    cute:["Pastel Pink","Lavender","Blush Pink","Mint Green","Sky Blue","Turquoise","Aqua","Cream","Rose Gold"],
+    formal:["Black","White","Navy Blue","Charcoal Gray","Ivory","Champagne","Silver","Deep Purple","Emerald Green","Ruby Red","Royal Blue"],
+    sporty:["Black","White","Coral","Gray","Denim Blue","Mustard","Orange","Sky Blue","Turquoise"],
+    academic:["Navy Blue","Gray","White","Light Blue","Charcoal Gray","Beige","Dusty Blue"],
+    elegant:["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold"],
+    casual:["Light Blue","White","Denim Blue","Beige","Mint Green","Khaki","Blush Pink","Sage Green"]
+  };
+  if(user.event_theme) colors = colors.filter(c => themeColors[user.event_theme]?.includes(c));
 
-    <div class="mb-3 text-yellow-300 leading-relaxed">
-      <b>Gender:</b> ${user.gender}<br>
-      <b>Weather:</b> ${user.weather}<br>
-      <b>Location:</b> ${user.location_type || "—"}<br>
-      <b>Theme:</b> ${user.event_theme || "—"}<br>
-      <b>Selected Top:</b> ${selectedTop || "—"}
-    </div>
+  // --- BOTTOM-TOP COMPATIBILITY ---
+  const topBottomCompatibility = {
+    "T-Shirt": ["Jeans","Trousers","Pants","Slacks","Cargo Pants","Jogger Pants","Sweatpants","Shorts"],
+    "Shirt": ["Jeans","Trousers","Pants","Slacks","Cargo Pants","Kain Pelikat"],
+    "Blouse": ["Jeans","Palazzo","Skirt"],
+    "Crop Top": ["Palazzo","Skirt","Shorts"],
+    "Sweater": ["Jeans","Jogger Pants","Sweatpants","Slacks","Trousers"],
+    "Knit Top": ["Jeans","Palazzo","Skirt","Cargo Pants","Slacks"],
+    "Jersey": ["Jeans","Cargo Pants","Jogger Pants","Sweatpants","Shorts"],
+    "Tank Top": ["Shorts","Palazzo"],
+    "Long Sleeve Top": ["Jeans","Palazzo","Skirt"],
+    "Hoodie": ["Jeans","Jogger Pants","Sweatpants"],
+    "Dress Shirt": ["Jeans","Trousers","Pants","Slacks","Skirt","Palazzo","Kain Pelikat"],
+    "Baju Kurung": ["Kain Batik"],
+    "Baju Melayu": ["Trousers","Pants"],
+    "Baju Kebaya": ["Skirt","Palazzo"],
+    "Collar Shirt": ["Trousers","Pants","Slacks","Kain Pelikat"],
+    "Dress": ["Skirt"]
+  };
 
-    <div class="mb-3">
-      <b class="text-green-300">Compatible Bottoms</b><br>
-      ${bottoms.length ? bottoms.join("<br>") : "<span class='text-red-400'>NONE</span>"}
-    </div>
+  if(topBottomCompatibility[chosenTop]) bottoms = topBottomCompatibility[chosenTop];
 
-    <div>
-      <b class="text-green-300">Available Colors</b><br>
-      ${colors.length ? colors.join("<br>") : "<span class='text-red-400'>NONE</span>"}
-    </div>
-  `;
+  filteredBottoms = bottoms;
+  filteredTops = [chosenTop];
+  filteredColors = colors;
 
-  panel.classList.remove('hidden');
+  renderDebugInfo([chosenTop], bottoms, colors, user);
+
+  return getRandomSubset(filteredBottoms, chosenTop, filteredColors);
 }
 
 /***********************
  * DISPLAY RESULTS
  ***********************/
-function displayRuleResult(result){
-  const section = document.getElementById('result-container');
-  const swatches = document.getElementById('color-swatches');
+function displayBottomResult(result){
+  const colorSwatches = document.getElementById('color-swatches');
   const combos = document.getElementById('combinations-list');
-  if(!section || !swatches || !combos) return;
+  const resultsSection = document.getElementById('result-container');
+  if(!colorSwatches || !combos || !resultsSection) return;
 
-  swatches.innerHTML = result.colors.map(c=>`
+  colorSwatches.innerHTML = result.color.map(c => `
     <div class="text-center">
       <div class="color-swatch mb-2 w-13 h-10 mx-auto" style="background:${getColorCode(c)}"></div>
       <p class="text-sm font-medium mb-6">${c}</p>
     </div>
-  `).join("");
+  `).join('');
 
   combos.innerHTML = `
-  <div class="mb-6">
-    <h4 class="text-center font-semibold mb-3">Your Top</h4>
+    <div class="mb-6">
+      <h4 class="font-semibold text-center mb-3">Your Top</h4>
       <div class="flex justify-center">
-        <div class="outfit-card flex flex-col items-center text-center w-1/2 h-full">
-          <img src="/images/tops/${result.top.toLowerCase().replace(/\s/g,'_')}.jpg"
-              class="w-full max-h-40 object-contain rounded-xl mb-2">
-          <p class="text-sm font-medium mt-auto">${result.top}</p>
+        <div class="outfit-card flex flex-col text-center h-full w-1/2">
+          <img src="/images/tops/${result.tops[0].toLowerCase().replace(/\s/g,'_')}.jpg"
+               class="w-full max-h-40 object-contain rounded-xl mb-2">
+          <p class="text-sm font-medium mt-auto">${result.tops[0]}</p>
         </div>
       </div>
     </div>
-
-    <div>
-      <h4 class="text-center font-semibold mb-3">Recommended Bottoms</h4>
+    <div class="mb-6">
+      <h4 class="font-semibold text-center mb-3">Recommended Bottoms</h4>
       <div class="grid grid-cols-2 gap-4">
-        ${result.bottoms.map(b=>`
-          <div class="outfit-card flex flex-col items-center text-center h-full w-full">
+        ${result.bottoms.map(b => `
+          <div class="outfit-card flex flex-col text-center h-full w-full">
             <img src="/images/bottoms/${b.toLowerCase().replace(/\s/g,'_')}.jpg"
-                class="w-full max-h-40 object-contain rounded-xl mb-2">
+                 class="w-full max-h-40 object-contain rounded-xl mb-2">
             <p class="text-sm font-medium mt-auto">${b}</p>
           </div>
-        `).join("")}
+        `).join('')}
       </div>
     </div>
   `;
-
-
-  section.classList.remove("hidden","opacity-0");
+  resultsSection.classList.remove('hidden','opacity-0');
+  resultsSection.classList.add('opacity-100');
 }
 
 /***********************
  * FORM HANDLER
  ***********************/
-function handleFormSubmit(e){
+function handleBottomFormSubmit(e){
   e.preventDefault();
-
   const user = {
     gender: document.getElementById('gender')?.value,
     weather: document.getElementById('weather')?.value,
@@ -434,49 +441,33 @@ function handleFormSubmit(e){
   };
 
   if(!user.gender || !user.weather || !user.event_type || !user.top){
-    showNotification("Please fill Gender, Weather, Event Type and Top.");
+    showNotification("Please provide Gender, Event Type, Weather, and Top.");
     return;
   }
 
-  // 👉 APPLY RULES ONCE
-  const result = applyRules(user);
-
-  // 👉 SHOW RESULTS
-  displayRuleResult(result);
-
-  // 👉 SHOW DEBUG (THIS WAS MISSING)
-  renderDebugInfo(
-    filteredState.bottoms, // FULL compatible bottoms
-    user.top,
-    filteredState.colors,
-    user
-  );
+  lastUserInput = user; // store last submission
+  displayBottomResult(filterBottomsByRules(user));
 }
 
-/***********************
- * RE-PICK
- ***********************/
-function pickOtherCombination(){
-  if(!filteredState.bottoms.length){
+function pickOtherBottom(){
+  if(!lastUserInput){
     showNotification("Submit the form first!");
     return;
   }
 
-  displayRuleResult({
-    top: filteredState.top,
-    bottoms: shuffle(filteredState.bottoms).slice(0,2),
-    colors: shuffle(filteredState.colors).slice(0,4)
-  });
+  // Recompute new combo using last submitted top/user
+  const result = filterBottomsByRules(lastUserInput);
+  displayBottomResult(result);
 }
+
 /***********************
- * STAR RAIN EFFECT
+ * STAR RAIN
  ***********************/
 function initStarRain(){
   const container = document.getElementById('sprinkle-rain');
   if(!container) return;
   const colors = ['#FFFFFF','#d1c5b1','#d1b386','#be6e3f','#b9885c'];
   const shapes = ['✦','✧','★','✶','✴','✷'];
-
   function createStar(){
     const star = document.createElement('div');
     star.className = 'star';
@@ -499,25 +490,48 @@ function initStarRain(){
     }
     requestAnimationFrame(fall);
   }
-
   for(let i=0;i<20;i++) setTimeout(createStar,i*100);
   setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
 }
 
+/***********************
+ * DEBUG PANEL
+ ***********************/
+function renderDebugInfo(tops, bottoms, colors, user){
+  const panel = document.getElementById('debug-panel');
+  if(!panel) return;
+  panel.innerHTML = `
+    <div class="mb-2 text-green-400 font-bold">[DEV MODE] Bottom Rule Evaluation</div>
+    <div class="mb-2 text-yellow-300">
+      Gender: ${user.gender}<br>
+      Weather: ${user.weather}<br>
+      Location: ${user.location_type || "—"}<br>
+      Theme: ${user.event_theme || "—"}<br>
+      Event Type: ${user.event_type || "—"}<br>
+      Selected Top: ${tops[0] || "—"}
+    </div>
+    <div class="mb-2"><b>Remaining Bottoms</b><br>${bottoms.join("<br>") || "NONE"}</div>
+    <div class="mb-2"><b>Remaining Tops</b><br>${tops.join("<br>") || "NONE"}</div>
+    <div><b>Remaining Colors</b><br>${colors.join("<br>") || "NONE"}</div>
+  `;
+  panel.classList.remove('hidden');
+}
 
 /***********************
- * INIT
+ * MAIN INIT
  ***********************/
 document.addEventListener('DOMContentLoaded', async ()=>{
   await loadHTML('./parts/formbottom.html','form-container');
   await loadHTML('./parts/result.html','result-container');
 
-  document.querySelector('#outfit-form')?.addEventListener('submit',handleFormSubmit);
-  document.querySelector('#pick-other-btn')?.addEventListener('click',pickOtherCombination);
+  document.querySelector('#outfit-form')?.addEventListener('submit', handleBottomFormSubmit);
+  document.querySelector('#pick-other-btn')?.addEventListener('click', pickOtherBottom);
 
   initStarRain();
 });
 </script>
+
+
 <script src="/assets/js/sidebar.js"></script>
 
 
