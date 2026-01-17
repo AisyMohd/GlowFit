@@ -1,11 +1,10 @@
-<div class="rounded-3xl p-8 shadow-2xl mb-8 bg-white">
-  <form id="outfit-form"> <!-- ID added here -->
+ <form id="outfit-form" class="mt-4 mb-4"> <!-- ID added here -->
 
     <!-- Event Type -->
-    <div class="mb-6">
+    <div class="mb-4">
       <label for="event-type" id="event-type-label"
         class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
-        Event Type
+        Event Type <span class="text-red-500">*</span>
       </label>
 
       <select id="event-type" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
@@ -22,10 +21,10 @@
     </div>
 
     <!-- Gender -->
-    <div class="mb-8">
+    <div class="mb-4">
       <label for="gender" id="gender-label"
         class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
-        Gender
+        Gender <span class="text-red-500">*</span>
       </label>
 
       <select id="gender" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
@@ -36,10 +35,10 @@
     </div>
 
     <!-- Weather -->
-    <div class="mb-6">
+    <div class="mb-4">
       <label for="weather" id="weather-label"
         class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
-        Weather
+        Weather <span class="text-red-500">*</span>
       </label>
 
       <select id="weather" class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
@@ -52,7 +51,7 @@
       </select>
     </div>
     <!-- Event Theme -->
-    <div class="mb-6">
+    <div class="mb-4">
       <label for="event-theme" id="event-theme-label"
         class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
         Event Theme
@@ -70,7 +69,7 @@
     </div>
 
     <!-- Location -->
-    <div class="mb-8">
+    <div class="mb-4">
       <label for="location" id="location-label"
         class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
         Location
@@ -89,10 +88,14 @@
 
 
     <!-- Bottom -->
-    <div class="mb-6">
-      <label for="bottom" class="block mb-2 font-semibold text-gray-700">Your Bottom</label>
-      <select id="bottom" name="bottom" required>
-        <option value="">Select Bottom</option>
+    <div class="mb-8">
+      <label for="bottom" class="block text-lg font-semibold mt-2 mb-1 text-slate-800">
+        Your Bottom <span class="text-red-500">*</span>
+      </label>
+      <select id="bottom" name="bottom" 
+        class="w-full focus:outline-none px-4 py-2 rounded-md border border-gray-300 shadow-sm focus:shadow-md focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+      required>
+        <option value="">Select bottom...</option>
         <option value="Jeans">Jeans</option>
         <option value="Palazzo Pants">Palazzo Pants</option>
         <option value="Skirt">Skirt</option>
@@ -105,4 +108,4 @@
       Get Color Recommendations
     </button>
   </form>
-</div>
+
