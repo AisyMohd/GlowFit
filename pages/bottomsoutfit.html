@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
@@ -7,7 +8,6 @@
 <link rel="icon" type="image/png" href="/images/logo glowfit.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/sidebar.css">
   <style>
     :root {
       --tamarillo: #9e1814;
@@ -155,27 +155,31 @@
       </header>
 
     <!-- SINGLE PANEL CONTAINER -->
-    <div class="max-w-6xl mx-auto h-[80vh] bg-white/20 backdrop-blur-xl rounded-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
+    <div class="max-w-6xl mx-auto h-[90vh] bg-white/20 backdrop-blur-xl rounded-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl">
 
       <!-- LEFT: FORM -->
-      <section class="w-full md:w-2/5 p-10 flex flex-col justify-center">
+      <section class="w-full md:w-[35%] px-8 flex flex-col justify-center">
         <div id="form-container" class="space-y-4 w-full max-w-xs mt-8 mb-8"></div>
       </section>
 
       <!-- DIVIDER -->
-      <div class="w-full md:w-px h-px md:h-auto bg-black/30 my-4 md:my-0"></div>
+      <div class="hidden md:block absolute top-3 bottom-3 w-px bg-black/30"
+     style="left:35%"></div>
 
       <!-- RIGHT: RESULTS -->
-      <section class="w-full md:w-3/5 p-3 flex flex-col overflow-y-auto">
+      <section class="w-full md:w-[65%] flex flex-col overflow-y-auto">
         <!-- TITLE -->
-        <h2 class="text-3xl font-bold text-center mb-2 font-card-title">
+        <h2 class="text-3xl font-bold text-center mt-4 mb-2 font-card-title">
           Your Personalized Outfit
         </h2>
 
         <!-- RESULTS -->
-        <div id="result-container" class="flex-1 overflow-y-auto hidden opacity-0 transition-opacity duration-500">
-          <div id="color-swatches" class="grid grid-cols-2 gap-4 mb-6"></div>
-          <div id="combinations-list"></div>
+        <div id="result-container"class="w-full flex flex-col
+            px-6   <!-- horizontal padding left/right -->
+            overflow-y-auto hidden opacity-0
+            transition-opacity duration-500">
+          <div id="color-swatches" class="grid grid-cols-2 gap-4 w-full"></div>
+          <div id="combinations-list" class="w-full mt-6"></div>
         </div>
       </section>
 
@@ -378,30 +382,37 @@ function displayRuleResult(result){
 
   swatches.innerHTML = result.colors.map(c=>`
     <div class="text-center">
-      <div class="w-10 h-10 mx-auto rounded-full" style="background:${getColorCode(c)}"></div>
-      <p class="text-sm">${c}</p>
+      <div class="color-swatch mb-2 w-13 h-10 mx-auto" style="background:${getColorCode(c)}"></div>
+      <p class="text-sm font-medium mb-6">${c}</p>
     </div>
   `).join("");
 
   combos.innerHTML = `
-    <div class="mb-6">
-      <h4 class="text-center font-semibold mb-3">Your Top</h4>
-      <p class="text-center">${result.top}</p>
+  <div class="mb-6">
+    <h4 class="text-center font-semibold mb-3">Your Top</h4>
+      <div class="flex justify-center">
+        <div class="outfit-card flex flex-col items-center text-center w-1/2 h-full">
+          <img src="/images/tops/${result.top.toLowerCase().replace(/\s/g,'_')}.jpg"
+              class="w-full max-h-40 object-contain rounded-xl mb-2">
+          <p class="text-sm font-medium mt-auto">${result.top}</p>
+        </div>
+      </div>
     </div>
 
     <div>
       <h4 class="text-center font-semibold mb-3">Recommended Bottoms</h4>
       <div class="grid grid-cols-2 gap-4">
         ${result.bottoms.map(b=>`
-          <div class="text-center">
+          <div class="outfit-card flex flex-col items-center text-center h-full w-full">
             <img src="/images/bottoms/${b.toLowerCase().replace(/\s/g,'_')}.jpg"
-                 class="w-full max-h-40 object-contain rounded-xl mb-2">
-            <p>${b}</p>
+                class="w-full max-h-40 object-contain rounded-xl mb-2">
+            <p class="text-sm font-medium mt-auto">${b}</p>
           </div>
         `).join("")}
       </div>
     </div>
   `;
+
 
   section.classList.remove("hidden","opacity-0");
 }
@@ -506,7 +517,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   initStarRain();
 });
 </script>
-<script src="/assets/js/sidebar.js"></script>
+
 
 
 </body>
