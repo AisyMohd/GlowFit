@@ -227,12 +227,12 @@ async function loadHTML(url, containerId){
  ***********************/
 const allTops = [
   "T-Shirt","Blouse","Sleeveless Top","Crop Top","Knit Top","Sweater","Jersey",
-  "Pajama Top","Dress Shirt","Baju Kurung","Baju Melayu","Baju Kebaya",
+  "Dress Shirt","Baju Kurung","Baju Melayu","Baju Kebaya",
   "Collar Shirt","Dress"
 ];
 
 const allBottoms = [
-  "Jeans","Trousers","Pants","Slacks","Cargo Pants","Jogger Pants",
+  "Jeans","Trousers","Slacks","Cargo Pants","Jogger Pants",
   "Sweatpants","Shorts","Skirt","Palazzo","Kain Batik","Kain Pelikat"
 ];
 
@@ -249,7 +249,7 @@ const allColors = [
 let filteredBottoms = [];
 let filteredTops = [];
 let filteredColors = [];
-let lastUserInput = null; // store last submitted form
+let lastUserInput = null;
 
 /***********************
  * COLOR MAP
@@ -272,18 +272,54 @@ function getColorCode(name){
 }
 
 /***********************
- * UTILITIES
+ * COMPULSORY PAIRS
+ ***********************/
+const compulsoryBottomForTop = {
+  "Baju Kurung": ["Kain Batik"],
+  "Baju Kebaya": ["Kain Batik"]
+};
+const compulsoryTopForBottom = {
+  "Kain Batik": ["Baju Kurung","Baju Kebaya"],
+  "Kain Pelikat": ["Baju Melayu"]
+};
+
+/***********************
+ * PICK RANDOM SUBSET
  ***********************/
 function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function getRandomSubset(tops, bottoms, colors){
+  if(tops.length === 0) tops.push("T-Shirt");
+  if(bottoms.length === 0) bottoms.push("Jeans");
 
-function getRandomSubset(bottoms, top, colors){
+  let selectedTops = shuffle(tops).slice(0,2);
+  let selectedBottoms = shuffle(bottoms).slice(0,2);
+
+  // Top → Bottom rules
+  selectedTops.forEach(top=>{
+    if(compulsoryBottomForTop[top]){
+      const required = compulsoryBottomForTop[top];
+      if(!selectedBottoms.some(b=>required.includes(b))) selectedBottoms[0] = required[0];
+    }
+  });
+
+  // Bottom → Top rules
+  selectedBottoms.forEach(bottom=>{
+    if(compulsoryTopForBottom[bottom]){
+      const required = compulsoryTopForBottom[bottom];
+      if(!selectedTops.some(t=>required.includes(t))) selectedTops[0] = required[0];
+    }
+  });
+
   return {
-    bottoms: shuffle(bottoms).slice(0,2),
-    tops: [top],
+    tops: selectedTops,
+    bottoms: selectedBottoms,
     color: shuffle(colors).slice(0,4)
   };
 }
 
+/***********************
+ * NOTIFICATION
+ ***********************/
 function showNotification(msg){
   const n = document.createElement('div');
   n.textContent = msg;
@@ -301,24 +337,75 @@ function showNotification(msg){
  * RULE ENGINE
  ***********************/
 function filterBottomsByRules(user){
+  let tops = [user.top]; // selected top only
   let bottoms = [...allBottoms];
-  let tops = [...allTops];
   let colors = [...allColors];
-  const chosenTop = user.top || tops[0]; // fallback
 
-  // --- WEATHER ---
-  if(user.weather === "Hot") colors = colors.filter(c => !["Black","Dark Gray","Midnight Blue","Burgundy","Deep Purple","Ruby Red","Forest Green"].includes(c));
-  if(user.weather === "Rainy") colors = colors.filter(c => !["White","Pastel Pink","Lavender","Blush Pink","Cream","Ivory","Champagne"].includes(c));
-  if(user.weather === "Windy") colors = colors.filter(c => ["Earth Brown","Olive Green","Khaki","Muted Blue","Sage Green","Dusty Blue"].includes(c));
-
-  // --- LOCATION ---
-  if(["indoor","office","classroom","hall"].includes(user.location_type)){
-    tops = tops.filter(t => !["T-Shirt","Crop Top","Pajama Top","Jersey"].includes(t));
-    bottoms = bottoms.filter(b => !["Jeans","Shorts","Jogger Pants","Sweatpants"].includes(b));
+  // -------------------
+  // WEATHER rules
+  // -------------------
+   //Color for weather
+  if (user.weather === "Hot") {
+  colors = colors.filter(c =>
+    ![
+      "Black","Dark Gray","Charcoal Gray","Midnight Blue",
+      "Burgundy","Deep Purple","Ruby Red","Forest Green",
+      "Brown","Rust","Earth Brown"
+    ].includes(c)
+  );
+}
+  if (user.weather === "Rainy") {
+  colors = colors.filter(c =>
+    ![
+      "White","Ivory","Cream","Champagne","Gold","Silver",
+      "Pastel Pink","Lavender","Blush Pink","Mint Green",
+      "Sky Blue","Aqua"
+    ].includes(c)
+  );
+}
+  //Outfit for weather
+  if(user.weather === "Hot"){
+    tops = tops.filter(t =>
+      !["Sweater","Knit Top","Sweater"].includes(t)
+    );
   }
 
-  // --- GENDER ---
-  if(["male","boy"].includes(user.gender)){
+  if(user.weather === "Rainy"){
+    tops = tops.filter(t =>
+      !["Sleeveless Top","Crop Top"].includes(t)
+    );
+  }
+
+
+  // -------------------
+  // LOCATION rules
+  // ------------------- 
+const formalIndoorEvents = ["meeting", "wedding"];
+const formalThemes = ["formal", "elegant"];
+
+if (
+  user.location_type === "indoor" &&
+  (
+    formalIndoorEvents.includes(user.event_type) ||
+    formalThemes.includes(user.event_theme)
+  )
+) {
+  // Formal indoor tops only
+  tops = tops.filter(t =>
+    !["T-Shirt","Crop Top","Jersey","Sleeveless Top","Sweater"].includes(t)
+  );
+
+  // Formal indoor bottoms only
+  bottoms = bottoms.filter(b =>
+    !["Shorts","Jogger Pants","Sweatpants"].includes(b)
+  );
+}
+// -------------------
+  // GENDER rules
+  // -------------------
+  
+  //------THIS IS FOR WHICH OUTFIR ARE NOT FOR THAT GENDER--------
+    if(["male","boy"].includes(user.gender)){
     tops = tops.filter(t => !["Crop Top","Blouse","Dress","Baju Kurung","Baju Kebaya"].includes(t));
     bottoms = bottoms.filter(b => !["Skirt","Palazzo","Kain Batik"].includes(b));
   }
@@ -327,59 +414,81 @@ function filterBottomsByRules(user){
     bottoms = bottoms.filter(b => !["Jogger Pants","Sweatpants","Kain Pelikat","Shorts","Palazzo"].includes(b));
   }
 
-  // --- EVENT TYPE ---
-  const eventRestrictions = {
-    "going to class": { tops:["Crop Top","Pajama Top"], bottoms:["Kain Batik","Kain Pelikat","Palazzo","Shorts"] },
-    "office": { tops:["T-Shirt","Crop Top","Pajama Top"], bottoms:["Shorts","Jogger Pants","Sweatpants"] },
-    "party": { tops:["Pajama Top"], bottoms:["Sweatpants"] },
-    "sport": { tops:["Blouse","Baju Kurung","Dress Shirt"], bottoms:["Skirt","Palazzo","Kain Batik"] }
-  };
+  // -------------------
+  // EVENT TYPE rules
+// -------------------
+
+//---THIS IS FOR WHICH OUTFIT NOT SUITABLE FOR EVENT----
+const eventRestrictions = {
+  "smart casual": {
+    tops: ["T-Shirt","Crop Top","Sleeveless Top"],
+    bottoms: ["Shorts","Jogger Pants"],
+  },
+  "meeting": {
+    tops: ["T-Shirt","Crop Top","Sweater","Sleeveless Top","Jersey"],
+    bottoms: ["Shorts","Jogger Pants","Sweatpants","Cargo Pants"],
+  },
+
+  "party": {
+    tops: ["Sweater"],
+    bottoms: ["Sweatpants","Jogger Pants"],
+  },
+
+  "sports day": {
+    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress"],
+    bottoms: ["Skirt","Palazzo Pants","Kain Batik","Kain Pelikat","Jeans"],
+  },
+
+  "wedding": {
+    tops: ["T-Shirt","Crop Top","Tank Top","Sweater","Jersey"],
+    bottoms: ["Shorts","Jogger Pants","Sweatpants","Cargo Pants"],
+  }
+};
+
   if(user.event_type && eventRestrictions[user.event_type]){
     const r = eventRestrictions[user.event_type];
     if(r.tops) tops = tops.filter(t => !r.tops.includes(t));
     if(r.bottoms) bottoms = bottoms.filter(b => !r.bottoms.includes(b));
   }
 
-  // --- THEME COLORS ---
-  const themeColors = {
-    cute:["Pastel Pink","Lavender","Blush Pink","Mint Green","Sky Blue","Turquoise","Aqua","Cream","Rose Gold"],
-    formal:["Black","White","Navy Blue","Charcoal Gray","Ivory","Champagne","Silver","Deep Purple","Emerald Green","Ruby Red","Royal Blue"],
-    sporty:["Black","White","Coral","Gray","Denim Blue","Mustard","Orange","Sky Blue","Turquoise"],
-    academic:["Navy Blue","Gray","White","Light Blue","Charcoal Gray","Beige","Dusty Blue"],
-    elegant:["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold"],
-    casual:["Light Blue","White","Denim Blue","Beige","Mint Green","Khaki","Blush Pink","Sage Green"]
-  };
-  if(user.event_theme) colors = colors.filter(c => themeColors[user.event_theme]?.includes(c));
+  // -------------------
+  // THEME rules
+  // -------------------
 
+  //--COLOR FOR THEME--
+  const themeColors = {
+  cute: ["Pastel Pink","Lavender","Blush Pink","Mint Green","Sky Blue","Turquoise","Aqua","Cream","Rose Gold","Light Blue"],
+
+  formal: ["Black","White","Navy Blue","Charcoal Gray","Dark Gray","Ivory","Champagne","Silver","Deep Purple","Emerald Green","Ruby Red","Royal Blue","Midnight Blue","Burgundy"],
+
+  sporty: ["Black","White","Gray","Denim Blue","Coral","Mustard","Orange","Yellow","Sky Blue","Turquoise","Aqua"],
+
+  elegant: ["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold","Champagne"]
+};
+  if(user.event_theme) colors = colors.filter(c => themeColors[user.event_theme]?.includes(c));
+  
+  
   // --- BOTTOM-TOP COMPATIBILITY ---
   const topBottomCompatibility = {
-    "T-Shirt": ["Jeans","Trousers","Pants","Slacks","Cargo Pants","Jogger Pants","Sweatpants","Shorts"],
-    "Shirt": ["Jeans","Trousers","Pants","Slacks","Cargo Pants","Kain Pelikat"],
-    "Blouse": ["Jeans","Palazzo","Skirt"],
-    "Crop Top": ["Palazzo","Skirt","Shorts"],
-    "Sweater": ["Jeans","Jogger Pants","Sweatpants","Slacks","Trousers"],
+    "T-Shirt": ["Jeans","Trousers","Slacks","Cargo Pants","Jogger Pants","Sweatpants","Shorts"],
+    "Shirt": ["Jeans","Trousers","Slacks","Cargo Pants"],
+    "Blouse": ["Jeans","Palazzo","Skirt","Slacks","Cargo Pants"],
+    "Crop Top": ["Jeans","Palazzo","Skirt","Slacks","Cargo Pants","Shorts"],
+    "Sweater": ["Jeans","Jogger Pants","Sweatpants","Slacks","Trousers","Jogger Pants","Shorts"],
     "Knit Top": ["Jeans","Palazzo","Skirt","Cargo Pants","Slacks"],
     "Jersey": ["Jeans","Cargo Pants","Jogger Pants","Sweatpants","Shorts"],
-    "Tank Top": ["Shorts","Palazzo"],
-    "Long Sleeve Top": ["Jeans","Palazzo","Skirt"],
-    "Hoodie": ["Jeans","Jogger Pants","Sweatpants"],
-    "Dress Shirt": ["Jeans","Trousers","Pants","Slacks","Skirt","Palazzo","Kain Pelikat"],
-    "Baju Kurung": ["Kain Batik"],
-    "Baju Melayu": ["Trousers","Pants"],
-    "Baju Kebaya": ["Skirt","Palazzo"],
-    "Collar Shirt": ["Trousers","Pants","Slacks","Kain Pelikat"],
-    "Dress": ["Skirt"]
+    "Dress Shirt": ["Jeans","Trousers","Slacks","Skirt","Palazzo"],
+    "Collar Shirt": ["Jeans","Trousers","Slacks"]
   };
 
-  if(topBottomCompatibility[chosenTop]) bottoms = topBottomCompatibility[chosenTop];
+ if(topBottomCompatibility[user.top]) bottoms = topBottomCompatibility[user.top];
 
+  filteredTops = tops;
   filteredBottoms = bottoms;
-  filteredTops = [chosenTop];
   filteredColors = colors;
 
-  renderDebugInfo([chosenTop], bottoms, colors, user);
-
-  return getRandomSubset(filteredBottoms, chosenTop, filteredColors);
+  renderDebugInfo(tops,bottoms,colors,user);
+  return getRandomSubset(tops,bottoms,colors);
 }
 
 /***********************
@@ -391,7 +500,7 @@ function displayBottomResult(result){
   const resultsSection = document.getElementById('result-container');
   if(!colorSwatches || !combos || !resultsSection) return;
 
-  colorSwatches.innerHTML = result.color.map(c => `
+  colorSwatches.innerHTML = result.color.map(c=>`
     <div class="text-center">
       <div class="color-swatch mb-2 w-13 h-10 mx-auto" style="background:${getColorCode(c)}"></div>
       <p class="text-sm font-medium mb-6">${c}</p>
@@ -412,7 +521,7 @@ function displayBottomResult(result){
     <div class="mb-6">
       <h4 class="font-semibold text-center mb-3">Recommended Bottoms</h4>
       <div class="grid grid-cols-2 gap-4">
-        ${result.bottoms.map(b => `
+        ${result.bottoms.map(b=>`
           <div class="outfit-card flex flex-col text-center h-full w-full">
             <img src="/images/bottoms/${b.toLowerCase().replace(/\s/g,'_')}.jpg"
                  class="w-full max-h-40 object-contain rounded-xl mb-2">
@@ -445,20 +554,18 @@ function handleBottomFormSubmit(e){
     return;
   }
 
-  lastUserInput = user; // store last submission
+  lastUserInput = user;
   displayBottomResult(filterBottomsByRules(user));
 }
 
-function pickOtherBottom(){
-  if(!lastUserInput){
+function pickOtherCombination(){
+  if(!filteredTops.length || !filteredBottoms.length || !filteredColors.length){
     showNotification("Submit the form first!");
     return;
   }
-
-  // Recompute new combo using last submitted top/user
-  const result = filterBottomsByRules(lastUserInput);
-  displayBottomResult(result);
+  displayBottomResult(getRandomSubset(filteredTops, filteredBottoms, filteredColors));
 }
+
 
 /***********************
  * STAR RAIN
@@ -468,6 +575,7 @@ function initStarRain(){
   if(!container) return;
   const colors = ['#FFFFFF','#d1c5b1','#d1b386','#be6e3f','#b9885c'];
   const shapes = ['✦','✧','★','✶','✴','✷'];
+
   function createStar(){
     const star = document.createElement('div');
     star.className = 'star';
@@ -497,7 +605,7 @@ function initStarRain(){
 /***********************
  * DEBUG PANEL
  ***********************/
-function renderDebugInfo(tops, bottoms, colors, user){
+function renderDebugInfo(tops,bottoms,colors,user){
   const panel = document.getElementById('debug-panel');
   if(!panel) return;
   panel.innerHTML = `
@@ -525,8 +633,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   await loadHTML('./parts/result.html','result-container');
 
   document.querySelector('#outfit-form')?.addEventListener('submit', handleBottomFormSubmit);
-  document.querySelector('#pick-other-btn')?.addEventListener('click', pickOtherBottom);
+  document.querySelector('#pick-other-btn')?.addEventListener('click', pickOtherCombination);
 
+  
   initStarRain();
 });
 </script>
