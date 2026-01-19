@@ -188,9 +188,9 @@
 
 </div>
 <!-- DEV DEBUG PANEL (VISIBLE FOR NOW) -->
-<div id="debug-panel"
+<!-- <div id="debug-panel"
      class="mt-4 p-4 rounded-xl bg-black/70 text-green-200 text-xs font-mono max-h-64 overflow-y-auto">
-</div>
+</div> -->
 
 
 </div>
@@ -630,25 +630,24 @@ function initStarRain(){
 /***********************
  * DEBUG PANEL
  ***********************/
-function renderDebugInfo(tops, bottoms, colors, user){
-  const panel = document.getElementById('debug-panel');
-  if(!panel) return;
-  panel.innerHTML = `
-    <div class="mb-2 text-green-400 font-bold">[DEV MODE] Rule Evaluation</div>
-    <div class="mb-2 text-yellow-300">
-      Gender: ${user.gender}<br>
-      Weather: ${user.weather}<br>
-      Location: ${user.location_type || "—"}<br>
-      Theme: ${user.event_theme || "—"}<br>
-      Event Type: ${user.event_type || "—"}<br>
-      Selected Bottom: ${bottoms[0] || "—"}
-    </div>
-    <div class="mb-2"><b>Remaining Tops</b><br>${tops.join("<br>") || "NONE"}</div>
-    <div class="mb-2"><b>Remaining Bottoms</b><br>${bottoms.join("<br>") || "NONE"}</div>
-    <div><b>Remaining Colors</b><br>${colors.join("<br>") || "NONE"}</div>
-  `;
-  panel.classList.remove('hidden');
+function renderDebugInfo(tops, bottoms, colors, userInput){
+  console.group("[DEV MODE] Rule Evaluation");
+
+  console.log("Input Facts:");
+  
+  console.log("  Type:", userInput.event_type);
+  console.log("  Gender:", userInput.gender);
+  console.log("  Weather:", userInput.weather);
+  console.log("  Location:", userInput.location_type || "—");
+  console.log("  Theme:", userInput.event_theme || "—");
+
+  console.log("Remaining Tops:", tops.length ? tops.join(", ") : "NONE");
+  console.log("Remaining Bottoms:", bottoms.length ? bottoms.join(", ") : "NONE");
+  console.log("Remaining Colors:", colors.length ? colors.join(", ") : "NONE");
+
+  console.groupEnd();
 }
+
 
 /***********************
  * MAIN INIT
