@@ -445,12 +445,14 @@ const eventRestrictions = {
   }
 };
 
-  if(user.event_type && eventRestrictions[user.event_type]){
+ if(user.event_type && eventRestrictions[user.event_type]){
     const r = eventRestrictions[user.event_type];
-    if(r.tops) tops = tops.filter(t => !r.tops.includes(t));
-    if(r.bottoms) bottoms = bottoms.filter(b => !r.bottoms.includes(b));
-  }
-
+    // Check if selected top is forbidden
+    if(r.tops && r.tops.includes(user.top)){
+        showNotification(`${user.top} is not suitable for ${user.event_type}`);
+        return null; // STOP execution here
+    }
+}
   // -------------------
   // THEME rules
   // -------------------
@@ -480,8 +482,9 @@ const eventRestrictions = {
     "Dress Shirt": ["Jeans","Trousers","Slacks","Skirt","Palazzo"],
     "Collar Shirt": ["Jeans","Trousers","Slacks"]
   };
-
- if(topBottomCompatibility[user.top]) bottoms = topBottomCompatibility[user.top];
+if(topBottomCompatibility[user.top]){
+    bottoms = bottoms.filter(b => topBottomCompatibility[user.top].includes(b));
+}
 
   filteredTops = tops;
   filteredBottoms = bottoms;

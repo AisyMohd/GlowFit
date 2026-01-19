@@ -447,6 +447,12 @@ const eventRestrictions = {
     if(r.tops) tops = tops.filter(t => !r.tops.includes(t));
     if(r.bottoms) bottoms = bottoms.filter(b => !r.bottoms.includes(b));
   }
+if (!bottoms.includes(user.bottom)) {
+  showNotification(
+    `${user.bottom} is not suitable for ${user.event_type}`
+  );
+  return null;
+}
 
   // -------------------
   // THEME rules
@@ -480,7 +486,8 @@ const eventRestrictions = {
   };
 
   // If user chooses a bottom, only show compatible tops
-  let chosenBottom = user.bottom || bottoms[0];
+  let chosenBottom = user.bottom;
+filteredBottoms = [chosenBottom];
   if(bottomTopCompatibility[chosenBottom]) tops = tops.filter(t => bottomTopCompatibility[chosenBottom].includes(t));
 
   filteredTops = tops;
