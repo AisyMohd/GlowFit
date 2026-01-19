@@ -227,13 +227,13 @@ async function loadHTML(url, containerId){
  ***********************/
 const allTops = [
   "T-Shirt","Blouse","Sleeveless Top","Crop Top","Knit Top","Sweater","Jersey",
-  "Dress Shirt","Baju Kurung","Baju Melayu","Baju Kebaya",
+  "Dress Shirt","Baju Kurung","Baju Melayu","kurta","Baju Kebaya",
   "Collar Shirt","Dress"
 ];
 
 const allBottoms = [
   "Jeans","Trousers","Slacks","Cargo Pants","Jogger Pants",
-  "Sweatpants","Shorts","Skirt","Palazzo","Kain Batik","Kain Pelikat"
+  "Sweatpants","Shorts","Skirt","Palazzo","Kain Batik","Sampin"
 ];
 
 const allColors = [
@@ -280,7 +280,7 @@ const compulsoryBottomForTop = {
 };
 const compulsoryTopForBottom = {
   "Kain Batik": ["Baju Kurung","Baju Kebaya"],
-  "Kain Pelikat": ["Baju Melayu"]
+  "Sampin": ["Baju Melayu","kurta"]
 };
 
 /***********************
@@ -410,8 +410,8 @@ if (
     bottoms = bottoms.filter(b => !["Skirt","Palazzo","Kain Batik"].includes(b));
   }
   if(["female","girl"].includes(user.gender)){
-    tops = tops.filter(t => !["Baju Melayu","Collar Shirt"].includes(t));
-    bottoms = bottoms.filter(b => !["Kain Pelikat"].includes(b));
+    tops = tops.filter(t => !["Baju Melayu","kurta","Collar Shirt"].includes(t));
+    bottoms = bottoms.filter(b => !["Sampin"].includes(b));
   }
 
   // -------------------
@@ -435,8 +435,8 @@ const eventRestrictions = {
   },
 
  "sports day": {
-    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress","Baju Melayu","Collor Shirt"],
-    bottoms: ["Skirt","Palazzo Pants","Kain Batik","Kain Pelikat","Jeans"],
+    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress","Baju Melayu","kurta","Collor Shirt"],
+    bottoms: ["Skirt","Palazzo Pants","Kain Batik","Sampin","Jeans"],
   },
 
   "wedding": {
@@ -474,7 +474,7 @@ const themeOutfits = {
     bottoms: ["Skirt","Palazzo","Jeans","Slacks","Trousers"]
   },
   formal: {
-    tops: ["Dress Shirt","Blouse","Collar Shirt","Baju Kurung","Baju Kebaya","Baju Melayu"],
+    tops: ["Dress Shirt","Blouse","Collar Shirt","Baju Kurung","Baju Kebaya","Baju Melayu","kurta"],
     bottoms: ["Slacks","Trousers","Palazzo","Kain Batik"]
   },
   sporty: {
@@ -482,7 +482,7 @@ const themeOutfits = {
     bottoms: ["Jogger Pants","Sweatpants","Shorts","Cargo Pants","Jeans","Trousers"]
   },
   elegant: {
-    tops: ["Dress","Dress Shirt","Baju Kurung","Baju Kebaya","Blouse","Baju Melayu"],
+    tops: ["Dress","Dress Shirt","Baju Kurung","Baju Kebaya","Blouse","Baju Melayu","kurta"],
     bottoms: ["Slacks","Palazzo","Skirt","Kain Batik"]
   }
 };
