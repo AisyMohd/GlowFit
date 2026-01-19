@@ -408,7 +408,7 @@ if (
   }
   if(["female","girl"].includes(user.gender)){
     tops = tops.filter(t => !["Baju Melayu","Collar Shirt"].includes(t));
-    bottoms = bottoms.filter(b => !["Jogger Pants","Sweatpants","Kain Pelikat","Shorts","Palazzo"].includes(b));
+    bottoms = bottoms.filter(b => !["Kain Pelikat"].includes(b));
   }
 
   // -------------------
@@ -432,12 +432,12 @@ const eventRestrictions = {
   },
 
   "sports day": {
-    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress"],
+    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress","Baju Melayu","Collor Shirt"],
     bottoms: ["Skirt","Palazzo Pants","Kain Batik","Kain Pelikat","Jeans"],
   },
 
   "wedding": {
-    tops: ["T-Shirt","Crop Top","Tank Top","Sweater","Jersey"],
+    tops: ["T-Shirt","Crop Top","Sweater","Jersey","Knit Top","Sleeveless Top"],
     bottoms: ["Shorts","Jogger Pants","Sweatpants","Cargo Pants"],
   }
 };
@@ -468,8 +468,34 @@ if (!bottoms.includes(user.bottom)) {
 
   elegant: ["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold","Champagne"]
 };
-  if(user.event_theme) colors = colors.filter(c => themeColors[user.event_theme]?.includes(c));
+// Theme → Tops & Bottoms
+const themeOutfits = {
+  cute: {
+    tops: ["Blouse","Dress","Dress Shirt","Crop Top","Knit Top"],
+    bottoms: ["Skirt","Palazzo","Jeans","Slacks","Trousers"]
+  },
+  formal: {
+    tops: ["Dress Shirt","Blouse","Collar Shirt","Baju Kurung","Baju Kebaya","Baju Melayu"],
+    bottoms: ["Slacks","Trousers","Palazzo","Kain Batik"]
+  },
+  sporty: {
+    tops: ["T-Shirt","Jersey","Sweater","Sleeveless Top","Crop Top"],
+    bottoms: ["Jogger Pants","Sweatpants","Shorts","Cargo Pants","Jeans","Trousers"]
+  },
+  elegant: {
+    tops: ["Dress","Dress Shirt","Baju Kurung","Baju Kebaya","Blouse","Baju Melayu"],
+    bottoms: ["Slacks","Palazzo","Skirt","Kain Batik"]
+  }
+};
 
+ // Apply theme outfit filtering
+if(user.event_theme && themeOutfits[user.event_theme]){
+  const allowedTops = themeOutfits[user.event_theme].tops;
+  const allowedBottoms = themeOutfits[user.event_theme].bottoms;
+
+  tops = tops.filter(t => allowedTops.includes(t));
+  bottoms = bottoms.filter(b => allowedBottoms.includes(b));
+}
   // BOTTOM-TOP COMPATIBILITY
   const bottomTopCompatibility = {
     "Jeans":["T-Shirt","Blouse","Sleeveless Top","Crop Top","Knit Top","Sweater","Jersey","Collar Shirt"],
