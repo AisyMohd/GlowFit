@@ -188,9 +188,9 @@
 
 </div>
 <!-- DEV DEBUG PANEL (VISIBLE FOR NOW) -->
-<div id="debug-panel"
+<!-- <div id="debug-panel"
      class="mt-4 p-4 rounded-xl bg-black/70 text-green-200 text-xs font-mono max-h-64 overflow-y-auto">
-</div>
+</div> -->
 
 
 </div>
@@ -456,7 +456,7 @@ if (
   }
   if(userInput.gender === "female" || userInput.gender === "girl"){
     tops = tops.filter(t => !["Baju Melayu","Collar Shirt"].includes(t));
-    bottoms = bottoms.filter(b => !["Jogger Pants","Sweatpants","Kain Pelikat","Shorts","Palazzo"].includes(b));
+    bottoms = bottoms.filter(b => !["Kain Pelikat"].includes(b));
   }
 
   // -------------------
@@ -480,12 +480,12 @@ const eventRestrictions = {
   },
 
   "sports day": {
-    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress"],
+    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress","Baju Melayu","Collor Shirt"],
     bottoms: ["Skirt","Palazzo Pants","Kain Batik","Kain Pelikat","Jeans"],
   },
 
   "wedding": {
-    tops: ["T-Shirt","Crop Top","Tank Top","Sweater","Jersey"],
+    tops: ["T-Shirt","Crop Top","Sweater","Jersey","Knit Top","Sleeveless Top"],
     bottoms: ["Shorts","Jogger Pants","Sweatpants","Cargo Pants"],
   }
 };
@@ -512,9 +512,35 @@ if(userInput.event_type && eventRestrictions[userInput.event_type]){
 
   elegant: ["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold","Champagne"]
 };
+// Theme → Tops & Bottoms
+const themeOutfits = {
+  cute: {
+    tops: ["Blouse","Dress","Dress Shirt","Crop Top","Knit Top"],
+    bottoms: ["Skirt","Palazzo","Jeans","Slacks","Trousers"]
+  },
+  formal: {
+    tops: ["Dress Shirt","Blouse","Collar Shirt","Baju Kurung","Baju Kebaya","Baju Melayu"],
+    bottoms: ["Slacks","Trousers","Palazzo","Kain Batik"]
+  },
+  sporty: {
+    tops: ["T-Shirt","Jersey","Sweater","Sleeveless Top","Crop Top"],
+    bottoms: ["Jogger Pants","Sweatpants","Shorts","Cargo Pants","Jeans","Trousers"]
+  },
+  elegant: {
+    tops: ["Dress","Dress Shirt","Baju Kurung","Baju Kebaya","Blouse","Baju Melayu"],
+    bottoms: ["Slacks","Palazzo","Skirt","Kain Batik"]
+  }
+};
 
 
-  if(userInput.event_theme) colors = colors.filter(c=>themeColors[userInput.event_theme]?.includes(c));
+ // Apply theme outfit filtering
+if(userInput.event_theme && themeOutfits[userInput.event_theme]){
+  const allowedTops = themeOutfits[userInput.event_theme].tops;
+  const allowedBottoms = themeOutfits[userInput.event_theme].bottoms;
+
+  tops = tops.filter(t => allowedTops.includes(t));
+  bottoms = bottoms.filter(b => allowedBottoms.includes(b));
+}
 
   filteredTops = tops;
   filteredBottoms = bottoms;
@@ -636,37 +662,21 @@ function initStarRain(){
   setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
 }
 function renderDebugInfo(tops, bottoms, colors, userInput){
-  const panel = document.getElementById('debug-panel');
-  if(!panel) return;
+  console.group("[DEV MODE] Rule Evaluation");
 
-  panel.innerHTML = `
-    <div class="mb-2 text-green-400 font-bold">[DEV MODE] Rule Evaluation</div>
+  console.log("Input Facts:");
+  
+  console.log("  Type:", userInput.event_type);
+  console.log("  Gender:", userInput.gender);
+  console.log("  Weather:", userInput.weather);
+  console.log("  Location:", userInput.location_type || "—");
+  console.log("  Theme:", userInput.event_theme || "—");
 
-    <div class="mb-2">
-      <span class="text-yellow-300">Input Facts:</span><br>
-      Gender: ${userInput.gender}<br>
-      Weather: ${userInput.weather}<br>
-      Location: ${userInput.location_type || "—"}<br>
-      Theme: ${userInput.event_theme || "—"}
-    </div>
+  console.log("Remaining Tops:", tops.length ? tops.join(", ") : "NONE");
+  console.log("Remaining Bottoms:", bottoms.length ? bottoms.join(", ") : "NONE");
+  console.log("Remaining Colors:", colors.length ? colors.join(", ") : "NONE");
 
-    <div class="mb-2">
-      <span class="text-yellow-300">Remaining Tops:</span><br>
-      ${tops.map(t=>`• ${t}`).join('<br>')}
-    </div>
-
-    <div class="mb-2">
-      <span class="text-yellow-300">Remaining Bottoms:</span><br>
-      ${bottoms.map(b=>`• ${b}`).join('<br>')}
-    </div>
-
-    <div>
-      <span class="text-yellow-300">Remaining Colors:</span><br>
-      ${colors.map(c=>`• ${c}`).join('<br>')}
-    </div>
-  `;
-
-  panel.classList.remove('hidden');
+  console.groupEnd();
 }
 
 
