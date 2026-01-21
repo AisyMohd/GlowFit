@@ -491,6 +491,10 @@ if(user.event_type && eventRestrictions[user.event_type]){
 
   elegant: ["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold","Champagne"]
 };
+if (userInput.event_theme && themeColors[userInput.event_theme]) {
+  const allowedColors = themeColors[userInput.event_theme];
+  colors = colors.filter(c => allowedColors.includes(c));
+}
 // Theme → Tops & Bottoms
 const themeOutfits = {
   cute: {
