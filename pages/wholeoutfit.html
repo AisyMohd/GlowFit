@@ -374,6 +374,39 @@ function renderDebugInfo(tops, bottoms, colors, userInput){
     </div>
   `;
 }
+/***********************
+ * EVENT → ALLOWED THEMES
+ ***********************/
+const eventAllowedThemes = {
+  "smart casual": ["cute","formal","elegant","sporty"],
+  "meeting": ["elegant","cute","formal"],
+  "sports day": ["cute","elegant","sporty"],
+  "party": ["cute","sporty","elegant"],
+  "wedding": ["formal","elegant"]
+};
+function updateThemeOptionsByEvent(eventType){
+  const themeSelect = document.getElementById("event-theme");
+  if(!themeSelect) return;
+
+  const allowed = eventAllowedThemes[eventType] || [];
+
+  [...themeSelect.options].forEach(opt => {
+    if(opt.value === ""){
+      opt.disabled = false;
+      opt.hidden = false;
+      return;
+    }
+
+    const isAllowed = allowed.includes(opt.value);
+    opt.disabled = !isAllowed;
+    opt.hidden = !isAllowed;
+  });
+
+  // reset if current theme is invalid
+  if(themeSelect.value && !allowed.includes(themeSelect.value)){
+    themeSelect.value = "";
+  }
+}
 
 
 /***********************
@@ -503,7 +536,17 @@ if(userInput.event_type && eventRestrictions[userInput.event_type]){
   // -------------------
   // THEME rules
   // -------------------
-
+if(
+  userInput.event_type &&
+  userInput.event_theme &&
+  eventAllowedThemes[userInput.event_type] &&
+  !eventAllowedThemes[userInput.event_type].includes(userInput.event_theme)
+){
+  showNotification(
+    `The "${userInput.event_theme}" theme is not suitable for ${userInput.event_type}.`
+  );
+  return null;
+}
   //--COLOR FOR THEME--
   const themeColors = {
   cute: ["Pastel Pink","Lavender","Blush Pink","Mint Green","Sky Blue","Turquoise","Aqua","Cream","Rose Gold","Light Blue"],
@@ -704,6 +747,13 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   const pickBtn = document.querySelector('#pick-other-btn');
   if(pickBtn) pickBtn.addEventListener('click', pickOtherCombination);
+   const eventSelect = document.getElementById("event-type");
+  if(eventSelect){
+    eventSelect.addEventListener("change", e => {
+      updateThemeOptionsByEvent(e.target.value);
+    });
+  }
+
 
   initStarRain();
 });
