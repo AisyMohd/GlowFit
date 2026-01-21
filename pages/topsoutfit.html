@@ -447,7 +447,7 @@ const eventRestrictions = {
   },
 
   "sports day": {
-    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress","Baju Melayu","kurta","collar Shirt"],
+    tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress","Baju Melayu","kurta","Collar Shirt"],
     bottoms: ["Skirt","Palazzo Pants","Kain Batik","Sampin","Jeans"],
   },
 
@@ -495,8 +495,8 @@ if (!bottoms.includes(user.bottom)) {
 
   elegant: ["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold","Champagne"]
 };
-if (userInput.event_theme && themeColors[userInput.event_theme]) {
-  const allowedColors = themeColors[userInput.event_theme];
+if (user.event_theme && themeColors[user.event_theme]) {
+  const allowedColors = themeColors[user.event_theme];
   colors = colors.filter(c => allowedColors.includes(c));
 }
 // Theme → Tops & Bottoms
@@ -676,16 +676,16 @@ function initStarRain(){
 /***********************
  * DEBUG PANEL
  ***********************/
-function renderDebugInfo(tops, bottoms, colors, userInput){
+function renderDebugInfo(tops, bottoms, colors, user){
   console.group("[DEV MODE] Rule Evaluation");
 
   console.log("Input Facts:");
   
-  console.log("  Type:", userInput.event_type);
-  console.log("  Gender:", userInput.gender);
-  console.log("  Weather:", userInput.weather);
-  console.log("  Location:", userInput.location_type || "—");
-  console.log("  Theme:", userInput.event_theme || "—");
+  console.log("  Type:", user.event_type);
+  console.log("  Gender:", user.gender);
+  console.log("  Weather:", user.weather);
+  console.log("  Location:", user.location_type || "—");
+  console.log("  Theme:", user.event_theme || "—");
 
   console.log("Remaining Tops:", tops.length ? tops.join(", ") : "NONE");
   console.log("Remaining Bottoms:", bottoms.length ? bottoms.join(", ") : "NONE");
