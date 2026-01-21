@@ -350,7 +350,7 @@ function filterBottomsByRules(user){
     ![
       "Black","Dark Gray","Charcoal Gray","Midnight Blue",
       "Burgundy","Deep Purple","Ruby Red","Forest Green",
-      "Brown","Rust","Earth Brown"
+      "Brown","Rust","Earth Brown","Navy Blue"
     ].includes(c)
   );
 }
@@ -462,14 +462,21 @@ const eventRestrictions = {
   }
 };
 
- if(user.event_type && eventRestrictions[user.event_type]){
-    const r = eventRestrictions[user.event_type];
-    // Check if selected top is forbidden
-    if(r.tops && r.tops.includes(user.top)){
-        showNotification(`${user.top} is not suitable for ${user.event_type}`);
-        return null; // STOP execution here
-    }
+if(user.event_type && eventRestrictions[user.event_type]){
+  const r = eventRestrictions[user.event_type];
+
+  // 🚫 Block forbidden TOP for the event
+  if(r.tops && r.tops.includes(user.top)){
+    showNotification(`${user.top} is not suitable for ${user.event_type}`);
+    return null; // STOP execution
+  }
+
+  // 🚫 Remove forbidden BOTTOMS for the event
+  if(r.bottoms){
+    bottoms = bottoms.filter(b => !r.bottoms.includes(b));
+  }
 }
+
   // -------------------
   // THEME rules
   // -------------------
@@ -522,7 +529,8 @@ if (user.top && tops.length === 0) {
     "T-Shirt": ["Jeans","Trousers","Slacks","Cargo Pants","Jogger Pants","Sweatpants","Shorts"],
     "Shirt": ["Jeans","Trousers","Slacks","Cargo Pants"],
     "Blouse": ["Jeans","Palazzo","Skirt","Slacks","Cargo Pants"],
-    "Crop Top": ["Jeans","Palazzo","Skirt","Slacks","Cargo Pants","Shorts"],
+    "Crop Top": ["Jeans","Palazzo","Slacks","Cargo Pants","Shorts","Skirts"],
+    "Sleeveless Top": ["Jeans","Palazzo","Slacks","Cargo Pants","Shorts","Skirt"],
     "Sweater": ["Jeans","Jogger Pants","Sweatpants","Slacks","Trousers","Jogger Pants","Shorts"],
     "Knit Top": ["Jeans","Palazzo","Skirt","Cargo Pants","Slacks"],
     "Jersey": ["Jeans","Cargo Pants","Jogger Pants","Sweatpants","Shorts"],

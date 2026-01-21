@@ -347,7 +347,7 @@ function filterByRules(user){
     ![
       "Black","Dark Gray","Charcoal Gray","Midnight Blue",
       "Burgundy","Deep Purple","Ruby Red","Forest Green",
-      "Brown","Rust","Earth Brown"
+      "Brown","Rust","Earth Brown","Navy Blue"
     ].includes(c)
   );
 }
@@ -457,11 +457,23 @@ const eventRestrictions = {
   }
 };
 
-  if(user.event_type && eventRestrictions[user.event_type]){
-    const r = eventRestrictions[user.event_type];
-    if(r.tops) tops = tops.filter(t => !r.tops.includes(t));
-    if(r.bottoms) bottoms = bottoms.filter(b => !r.bottoms.includes(b));
+if(user.event_type && eventRestrictions[user.event_type]){
+  const r = eventRestrictions[user.event_type];
+
+  // 🚫 Block forbidden BOTTOM choice
+  if(r.bottoms && r.bottoms.includes(user.bottom)){
+    showNotification(
+      `${user.bottom} is not suitable for ${user.event_type}`
+    );
+    return null; // STOP
   }
+
+  // 🚫 Remove forbidden TOPS from suggestions
+  if(r.tops){
+    tops = tops.filter(t => !r.tops.includes(t));
+  }
+}
+
 if (!bottoms.includes(user.bottom)) {
   showNotification(
     `${user.bottom} is not suitable for ${user.event_type}`
