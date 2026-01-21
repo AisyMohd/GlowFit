@@ -410,7 +410,22 @@ if (
     tops = tops.filter(t => !["Baju Melayu","kurta","Collar Shirt"].includes(t));
     bottoms = bottoms.filter(b => !["Sampin"].includes(b));
   }
-
+  const genderBottomRestriction = {
+  male: ["Skirt", "Palazzo", "Kain Batik"],
+  boy: ["Skirt", "Palazzo", "Kain Batik"],
+  female: ["Sampin"],
+  girl: ["Sampin"]
+};
+if (
+  user.bottom &&
+  genderBottomRestriction[user.gender] &&
+  genderBottomRestriction[user.gender].includes(user.bottom)
+) {
+  showNotification(
+    `${user.bottom} is not suitable for ${user.gender}`
+  );
+  return null; // stop rule engine
+}
   // -------------------
   // EVENT TYPE rules
 // -------------------
@@ -497,6 +512,16 @@ if(user.event_theme && themeOutfits[user.event_theme]){
   bottoms = bottoms.filter(b => allowedBottoms.includes(b));
 }
   // BOTTOM-TOP COMPATIBILITY
+// -------------------
+// FINAL BOTTOM CONSISTENCY VALIDATION
+// -------------------
+if (user.bottom && !bottoms.includes(user.bottom)) {
+  showNotification(
+    `${user.bottom} is not suitable for a ${user.event_theme || ""} ${user.event_type}`
+  );
+  return null; // ❗ STOP rule engine
+}
+
   const bottomTopCompatibility = {
     "Jeans":["T-Shirt","Blouse","Sleeveless Top","Crop Top","Knit Top","Sweater","Jersey","Collar Shirt"],
     "Trousers":["T-Shirt","Blouse","Sleeveless Top","Crop Top","Knit Top","Sweater","Jersey","Collar Shirt"],
@@ -515,7 +540,12 @@ if(user.event_theme && themeOutfits[user.event_theme]){
   let chosenBottom = user.bottom;
 filteredBottoms = [chosenBottom];
   if(bottomTopCompatibility[chosenBottom]) tops = tops.filter(t => bottomTopCompatibility[chosenBottom].includes(t));
-
+if (tops.length === 0) {
+    showNotification(
+        `No suitable tops available for the selected bottom "${chosenBottom}" with your other choices. Please adjust your selections.`
+    );
+    return null; // stop rule engine
+}
   filteredTops = tops;
   filteredBottoms = [chosenBottom];
   filteredColors = colors;

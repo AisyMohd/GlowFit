@@ -541,6 +541,12 @@ if(userInput.event_theme && themeOutfits[userInput.event_theme]){
   tops = tops.filter(t => allowedTops.includes(t));
   bottoms = bottoms.filter(b => allowedBottoms.includes(b));
 }
+if (tops.length === 0 || bottoms.length === 0) {
+  showNotification(
+    "Your selections are contradictory. Please adjust theme or event type."
+  );
+  return null; // ❗ STOP inference
+}
 
   filteredTops = tops;
   filteredBottoms = bottoms;
