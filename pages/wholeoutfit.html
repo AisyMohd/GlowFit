@@ -4,12 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GLOWFIT</title>
-
-<link rel="icon" type="image/png" href="${BASE_PATH}images/logo glowfit.png">
-
+<link rel="icon" type="image/png" href="/images/logo glowfit.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${BASE_PATH}assets/css/sidebar.css">
+<link rel="stylesheet" href="/assets/css/sidebar.css">
 <style>
     :root {
       --tamarillo: #9e1814;
@@ -24,6 +22,7 @@
     --soft-amber: #d1c5b1;
     --muddy-waters: #b9885c;
 
+
     --text-dark: #251d15; /* primary dark text */
     --text-secondary: #907a65; /* secondary text */
     }
@@ -34,6 +33,7 @@
       .font-tagline { font-family: 'Poppins', sans-serif; font-weight: 500; letter-spacing: 0.02em; color: var(--text-dark); }
       .font-card-title { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-dark); }
       .font-card-desc { font-family: 'Outfit', sans-serif; font-weight: 300; color: var(--text-secondary); }
+
 
     /* ===============================
        GLOBAL PAGE STYLING
@@ -50,6 +50,7 @@
       );
     }
 
+
     /* Subtle homepage radial pattern */
     .bg-pattern {
       background-image:
@@ -57,6 +58,7 @@
         radial-gradient(circle at 80% 20%, rgba(190,110,63,0.05), transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(157,24,20,0.03), transparent 50%);
     }
+
 
     /* ===============================
        BACKGROUND STAR / SPRINKLE EFFECT
@@ -69,16 +71,19 @@
       overflow: hidden;
     }
 
+
     .star {
       position: absolute;
       animation: twinkle 1.5s infinite alternate;
       filter: drop-shadow(0 0 3px rgba(255,255,255,.7));
     }
 
+
     @keyframes twinkle {
       from {opacity:.4;transform:scale(.85)}
       to {opacity:.9;transform:scale(1.15)}
     }
+
 
     /* Inputs */
     .input-field {
@@ -88,10 +93,12 @@
       transition:.3s;
     }
 
+
     .input-field:focus {
       transform: translateY(-2px);
       box-shadow:0 8px 24px rgba(0,0,0,.35);
     }
+
 
     /* Swatches hover */
     .color-swatch {
@@ -104,10 +111,13 @@
     }
 
 
+
+
     .recommendation-card {
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(16px);
     }
+
 
     .recommendation-card > div:nth-child(2) {
       background: linear-gradient(
@@ -117,6 +127,7 @@
         transparent
       );
     }
+
 
     /* Button */
     .submit-btn {
@@ -129,19 +140,25 @@
       box-shadow:0 12px 30px rgba(0,0,0,.5);
     }
 
+
   </style>
 </head>
 
+
 <body class="h-full bg-pattern">
+
 
 <!-- Stars -->
 <div id="sprinkle-rain"></div>
 
+
 <!-- App wrapper (NO background here) -->
 <div id="app-wrapper" class="relative min-h-screen z-20">
 
+
   <div class="py-8 px-5">
     <div class="max-w-6xl mx-auto">
+
 
       <!-- Header -->
       <header class="text-center mb-12">
@@ -156,17 +173,21 @@
         </p>
       </header>
 
+
     <!-- SINGLE PANEL CONTAINER -->
     <div class="max-w-6xl mx-auto h-[80vh] bg-white/20 backdrop-blur-xl rounded-3xl flex flex-col md:flex-row overflow-hidden shadow-2xl relative">
+
 
       <!-- LEFT: FORM -->
       <section class="w-full md:w-[35%] px-8 flex flex-col justify-center">
         <div id="form-container" class="space-y-2 w-full max-w-xs mt-8 mb-8"></div>
       </section>
 
+
       <!-- DIVIDER -->
       <div class="hidden md:block absolute top-3 bottom-3 w-px bg-black/30"
      style="left:35%"></div>
+
 
       <!-- RIGHT: RESULTS -->
       <section class="w-full md:w-[65%] flex flex-col overflow-y-auto">
@@ -174,6 +195,7 @@
         <h2 class="text-3xl font-bold text-center mt-4 mb-2 font-card-title">
           Your Personalized Outfit
         </h2>
+
 
         <!-- RESULTS -->
         <div id="result-container"class="w-full flex flex-col
@@ -185,7 +207,10 @@
         </div>
       </section>
 
+
 </div>
+
+
 
 
 </div>
@@ -195,21 +220,25 @@
 </div> -->
 
 
+
+
 </div>
+
+
 
 
   </div>
 </div>
+
 
     </div>
   </div>
 </div>
 
-  <!-- Scripts -->
-<script  src="${BASE_PATH}assets/js/sidebar.js">
-  // Determine correct base path depending on folder
-const BASE_PATH = window.location.pathname.includes("/pages/") ? "../" : "";
 
+  <!-- Scripts -->
+<script>
+  
 /***********************
  * HELPER: LOAD HTML PARTS
  ***********************/
@@ -229,6 +258,7 @@ async function loadHTML(url, containerId){
   }
 }
 
+
 /***********************
  * CLOTHING OPTIONS
  ***********************/
@@ -238,10 +268,12 @@ let allTops = [
   "Collar Shirt","Dress"
 ];
 
+
 let allBottoms = [
   "Jeans","Trousers","Slacks","Cargo Pants","Jogger Pants",
   "Sweatpants","Shorts","Skirt","Palazzo","Kain Batik","Sampin"
 ];
+
 
 let allColors = [
   "Navy Blue", "Charcoal Gray", "Black", "White", "Light Blue", "Burgundy",
@@ -255,6 +287,7 @@ let allColors = [
 let filteredTops = [];
 let filteredBottoms = [];
 let filteredColors = [];
+
 
 /***********************
  * COLOR MAP
@@ -287,6 +320,8 @@ const compulsoryTopForBottom = {
 };
 
 
+
+
 /*************************************
  * PICK OTHER COMBINATION FUNCTION
  *************************************/
@@ -295,7 +330,7 @@ function getRandomSubset(tops, bottoms, colors){
   let selectedTops = shuffle(tops).slice(0, 2);
   let selectedBottoms = shuffle(bottoms).slice(0, 2);
       /***********************************************
-     * THIS RULE IS FOR EVERYTIME BAJU KURUNG/KEBAYA 
+     * THIS RULE IS FOR EVERYTIME BAJU KURUNG/KEBAYA
      * NEED TO BE PAIR WITH KAIN BATIK AND OTHERS
      ************************************************/
     // ---- RULE 1: TOP → BOTTOM ----
@@ -303,16 +338,19 @@ function getRandomSubset(tops, bottoms, colors){
     if (compulsoryBottomForTop[top]) {
       const requiredBottoms = compulsoryBottomForTop[top];
 
+
       if (!selectedBottoms.some(b => requiredBottoms.includes(b))) {
         selectedBottoms[0] = requiredBottoms[0];
       }
     }
   });
 
+
   // ---- RULE 2: BOTTOM → TOP----
   selectedBottoms.forEach(bottom => {
     if (compulsoryTopForBottom[bottom]) {
       const requiredTops = compulsoryTopForBottom[bottom];
+
 
       if (!selectedTops.some(t => requiredTops.includes(t))) {
         selectedTops[0] = requiredTops[0];
@@ -320,12 +358,14 @@ function getRandomSubset(tops, bottoms, colors){
     }
   });
 
+
   return {
     tops: selectedTops,
     bottoms: selectedBottoms,
     color: shuffle(colors).slice(0, 4)
   };
 }
+
 
 function showNotification(message){
   const n = document.createElement('div');
@@ -340,6 +380,7 @@ function showNotification(message){
   setTimeout(()=>n.remove(), 3000);
 }
 
+
       /***********************************************
      *TO CHECK IF THE LOGIC ARE CORRECTED
      ************************************************/
@@ -350,8 +391,10 @@ function renderDebugInfo(tops, bottoms, colors, userInput){
     return;
   }
 
+
   panel.innerHTML = `
     <div style="color:#6ee7b7;font-weight:bold">[DEV MODE] Rule Debug</div>
+
 
     <div>
       <strong>Inputs</strong><br>
@@ -361,17 +404,21 @@ function renderDebugInfo(tops, bottoms, colors, userInput){
       Theme: ${userInput.event_theme || "—"}
     </div>
 
+
     <hr style="margin:8px 0;border-color:#064e3b">
+
 
     <div>
       <strong>Remaining Tops</strong><br>
       ${tops.length ? tops.join('<br>') : '<span style="color:red">NONE</span>'}
     </div>
 
+
     <div style="margin-top:6px">
       <strong>Remaining Bottoms</strong><br>
       ${bottoms.length ? bottoms.join('<br>') : '<span style="color:red">NONE</span>'}
     </div>
+
 
     <div style="margin-top:6px">
       <strong>Remaining Colors</strong><br>
@@ -393,7 +440,9 @@ function updateThemeOptionsByEvent(eventType){
   const themeSelect = document.getElementById("event-theme");
   if(!themeSelect) return;
 
+
   const allowed = eventAllowedThemes[eventType] || [];
+
 
   [...themeSelect.options].forEach(opt => {
     if(opt.value === ""){
@@ -402,16 +451,20 @@ function updateThemeOptionsByEvent(eventType){
       return;
     }
 
+
     const isAllowed = allowed.includes(opt.value);
     opt.disabled = !isAllowed;
     opt.hidden = !isAllowed;
   });
+
 
   // reset if current theme is invalid
   if(themeSelect.value && !allowed.includes(themeSelect.value)){
     themeSelect.value = "";
   }
 }
+
+
 
 
 /***********************
@@ -422,9 +475,11 @@ function filterByRules(userInput){
   let bottoms = [...allBottoms];
   let colors = [...allColors];
 
+
   // -------------------
   // WEATHER rules
   // -------------------
+
 
   //Color for weather
   if (userInput.weather === "Hot") {
@@ -447,6 +502,8 @@ function filterByRules(userInput){
 }
 
 
+
+
   //Outfit for weather
   if(userInput.weather === "Hot"){
     tops = tops.filter(t =>
@@ -454,17 +511,20 @@ function filterByRules(userInput){
     );
   }
 
+
   if(userInput.weather === "Rainy"){
     tops = tops.filter(t =>
       !["Sleeveless Top","Crop Top"].includes(t)
     );
   }
 
+
   // -------------------
   // LOCATION rules
-  // ------------------- 
+  // -------------------
 const formalIndoorEvents = ["meeting", "wedding"];
 const formalThemes = ["formal", "elegant"];
+
 
 if (
   userInput.location_type === "indoor" &&
@@ -478,6 +538,7 @@ if (
     !["T-Shirt","Crop Top","Jersey","Sleeveless Top","Sweater"].includes(t)
   );
 
+
   // Formal indoor bottoms only
   bottoms = bottoms.filter(b =>
     !["Shorts","Jogger Pants","Sweatpants"].includes(b)
@@ -485,10 +546,12 @@ if (
 }
 
 
+
+
   // -------------------
   // GENDER rules
   // -------------------
-  
+ 
   //------THIS IS FOR WHICH OUTFIR ARE NOT FOR THAT GENDER--------
   if(userInput.gender === "male" || userInput.gender === "boy"){
     tops = tops.filter(t => !["Crop Top","Blouse","Dress","Baju Kurung","Baju Kebaya"].includes(t));
@@ -499,9 +562,11 @@ if (
     bottoms = bottoms.filter(b => !["Sampin"].includes(b));
   }
 
+
   // -------------------
   // EVENT TYPE rules
 // -------------------
+
 
 //---THIS IS FOR WHICH OUTFIT NOT SUITABLE FOR EVENT----
 const eventRestrictions = {
@@ -514,29 +579,34 @@ const eventRestrictions = {
     bottoms: ["Shorts","Jogger Pants","Sweatpants","Cargo Pants"],
   },
 
+
   "party": {
     tops: ["Sweater"],
     bottoms: ["Sweatpants","Jogger Pants"],
   },
+
 
   "sports day": {
     tops: ["Blouse","Dress Shirt","Knit Top","Baju Kurung","Baju Kebaya","Dress","Baju Melayu","kurta","Collar Shirt"],
     bottoms: ["Skirt","Palazzo Pants","Kain Batik","Sampin","Jeans"],
   },
 
+
   "wedding": {
     tops: ["T-Shirt","Crop Top","Sweater","Jersey","Knit Top","Sleeveless Top"],
     bottoms: ["Shorts","Jogger Pants","Sweatpants","Cargo Pants"],
   }
 };
-  
+ 
 if(userInput.event_type && eventRestrictions[userInput.event_type]){
     const restrictions = eventRestrictions[userInput.event_type];
+
 
     if(restrictions.tops) tops = tops.filter(t => !restrictions.tops.includes(t));
     if(restrictions.bottoms) bottoms = bottoms.filter(b => !restrictions.bottoms.includes(b));
     //if(restrictions.colors) colors = colors.filter(c => !restrictions.colors.includes(c));
   }
+
 
   // -------------------
   // THEME rules
@@ -556,9 +626,12 @@ if(
   const themeColors = {
   cute: ["Pastel Pink","Lavender","Blush Pink","Mint Green","Sky Blue","Turquoise","Aqua","Cream","Rose Gold","Light Blue"],
 
+
   formal: ["Black","White","Navy Blue","Charcoal Gray","Dark Gray","Ivory","Champagne","Silver","Deep Purple","Emerald Green","Ruby Red","Royal Blue","Midnight Blue","Burgundy"],
 
+
   sporty: ["Black","White","Gray","Denim Blue","Coral","Mustard","Orange","Yellow","Sky Blue","Turquoise","Aqua"],
+
 
   elegant: ["Emerald Green","Deep Purple","Ruby Red","Gold","Burgundy","Forest Green","Rose Gold","Champagne"]
 };
@@ -587,10 +660,13 @@ const themeOutfits = {
 };
 
 
+
+
  // Apply theme outfit filtering
 if(userInput.event_theme && themeOutfits[userInput.event_theme]){
   const allowedTops = themeOutfits[userInput.event_theme].tops;
   const allowedBottoms = themeOutfits[userInput.event_theme].bottoms;
+
 
   tops = tops.filter(t => allowedTops.includes(t));
   bottoms = bottoms.filter(b => allowedBottoms.includes(b));
@@ -602,13 +678,16 @@ if (tops.length === 0 || bottoms.length === 0) {
   return null; // ❗ STOP inference
 }
 
+
   filteredTops = tops;
   filteredBottoms = bottoms;
   filteredColors = colors;
   renderDebugInfo(tops, bottoms, colors, userInput);
 
+
   return getRandomSubset(filteredTops, filteredBottoms, filteredColors);
 }
+
 
 /***********************
  * DISPLAY RESULTS
@@ -618,10 +697,12 @@ function displayRuleResult(result){
   const combos = document.getElementById('combinations-list');
   const resultsSection = document.getElementById('result-container');
 
+
   if(!colorSwatches || !combos || !resultsSection){
     console.warn("Result elements not found");
     return;
   }
+
 
   // Color swatches
   colorSwatches.innerHTML = result.color.map(c => `
@@ -630,6 +711,7 @@ function displayRuleResult(result){
       <p class="text-sm font-medium mb-6">${c}</p>
     </div>
   `).join('');
+
 
   // Outfit combinations
   const createGrid = (items, type) => `
@@ -647,14 +729,17 @@ function displayRuleResult(result){
     </div>
   `;
 
+
   combos.innerHTML =
     createGrid(result.tops,"Top") +
     createGrid(result.bottoms,"Bottom");
+
 
   // Reveal results
   resultsSection.classList.remove('hidden','opacity-0');
   resultsSection.classList.add('opacity-100');
 }
+
 
 /***********************
  * FORM HANDLERS
@@ -669,14 +754,17 @@ function handleFormSubmit(e){
     gender: document.getElementById('gender')?.value
   };
 
+
   const cleaned = Object.fromEntries(Object.entries(userInput).filter(([_,v])=>v && v!==""));
   if(!cleaned.gender || !cleaned.event_type || !cleaned.weather){
     showNotification("Please provide Gender, Event Type, and Weather.");
     return;
   }
 
+
   displayRuleResult(filterByRules(cleaned));
 }
+
 
 function pickOtherCombination(){
   if(!filteredTops.length || !filteredBottoms.length || !filteredColors.length){
@@ -686,6 +774,7 @@ function pickOtherCombination(){
   displayRuleResult(getRandomSubset(filteredTops, filteredBottoms, filteredColors));
 }
 
+
 /***********************
  * STAR RAIN
  ***********************/
@@ -694,6 +783,7 @@ function initStarRain(){
   if(!container) return;
   const colors = ['#FFFFFF','#d1c5b1','#d1b386','#be6e3f','#b9885c'];
   const shapes = ['✦','✧','★','✶','✴','✷'];
+
 
   function createStar(){
     const star = document.createElement('div');
@@ -709,8 +799,8 @@ function initStarRain(){
     container.appendChild(star);
     const fallDuration = Math.random()*5000+8000;
     const startTime = Date.now();
-    function fall(){ 
-      const progress=(Date.now()-startTime)/fallDuration; 
+    function fall(){
+      const progress=(Date.now()-startTime)/fallDuration;
       star.style.top = (-30 + progress*(window.innerHeight+60))+'px';
       if(progress<1) requestAnimationFrame(fall);
       else star.remove();
@@ -718,37 +808,46 @@ function initStarRain(){
     requestAnimationFrame(fall);
   }
 
+
   for(let i=0;i<20;i++) setTimeout(createStar,i*100);
   setInterval(()=>{for(let i=0;i<3;i++) createStar();},400);
 }
 function renderDebugInfo(tops, bottoms, colors, userInput){
   console.group("[DEV MODE] Rule Evaluation");
 
+
   console.log("Input Facts:");
-  
+ 
   console.log("  Type:", userInput.event_type);
   console.log("  Gender:", userInput.gender);
   console.log("  Weather:", userInput.weather);
   console.log("  Location:", userInput.location_type || "—");
   console.log("  Theme:", userInput.event_theme || "—");
 
+
   console.log("Remaining Tops:", tops.length ? tops.join(", ") : "NONE");
   console.log("Remaining Bottoms:", bottoms.length ? bottoms.join(", ") : "NONE");
   console.log("Remaining Colors:", colors.length ? colors.join(", ") : "NONE");
 
+
   console.groupEnd();
 }
+
+
 
 
 /***********************
  * MAIN INIT
  ***********************/
 document.addEventListener('DOMContentLoaded', async ()=>{
-  await loadHTML('./parts/form.html','form-container');
-  await loadHTML('./parts/result.html','result-container');
+await loadHTML(`${BASE_PATH}parts/form.html`, 'form-container');
+await loadHTML(`${BASE_PATH}parts/result.html`, 'result-container');
+
+
 
   const form = document.querySelector('#outfit-form');
   if(form) form.addEventListener('submit', handleFormSubmit);
+
 
   const pickBtn = document.querySelector('#pick-other-btn');
   if(pickBtn) pickBtn.addEventListener('click', pickOtherCombination);
@@ -760,10 +859,13 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 
 
+
+
   initStarRain();
 });
 </script>
 <script src="/assets/js/sidebar.js"></script>
+
 
 </body>
 </html>
