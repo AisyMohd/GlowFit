@@ -147,7 +147,7 @@ if (window.elementSdk) {
   }
   //end sidebar code
 
-   fetch('../components/sidebar.html')
+   fetch('./components/sidebar.html')
   .then(res => res.text())
   .then(html => {
     document
