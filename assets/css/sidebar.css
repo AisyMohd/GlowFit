@@ -191,4 +191,15 @@
     padding: 80px 24px 24px 24px;
     }
 }
+#backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 998;
+}
+
+#backdrop.active {
+  display: block;
+}
 /*end sidebar style*/

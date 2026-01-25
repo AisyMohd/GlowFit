@@ -147,5 +147,24 @@ if (window.elementSdk) {
   }
   //end sidebar code
 
+   fetch('/pages/sidebar.html')
+  .then(res => res.text())
+  .then(html => {
+    document
+      .getElementById('app-wrapper')
+      .insertAdjacentHTML('afterbegin', html); 
+
+    document.querySelectorAll('.menu-link').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelectorAll('.menu-link')
+          .forEach(l => l.classList.remove('active'));
+
+        link.classList.add('active');
+      });
+    });
+
+    initSidebar(); // ✅ NOW elements exist
+    //new code which add sidebar
+  });
 
   });

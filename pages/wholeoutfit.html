@@ -147,7 +147,7 @@
 
 <body class="h-full bg-pattern">
 
-<div id="sidebar"></div>
+<div id="sidebar-container"></div>
 <!-- Stars -->
 <div id="sprinkle-rain"></div>
 
@@ -841,7 +841,7 @@ function renderDebugInfo(tops, bottoms, colors, userInput){
  ***********************/
 document.addEventListener('DOMContentLoaded', async () => {
   // Load sidebar
-  await loadHTML("../components/sidebar.html", "sidebar");
+  await loadHTML("../components/sidebar.html", "sidebar-container");
 
   // Load form + result
   await loadHTML("../components/forms/form.html", "form-container");

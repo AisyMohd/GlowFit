@@ -1,14 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GLOWFIT</title>
-<link rel="icon" type="image/png" href="/images/logo glowfit.png">
+<link rel="icon" type="image/png" href="../images/logo glowfit.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/sidebar.css">
+<link rel="stylesheet" href="../assets/css/sidebar.css">
   <style>
     :root {
       --tamarillo: #9e1814;
@@ -133,6 +132,7 @@
 
 <body class="h-full bg-pattern">
 
+<div id="sidebar-container"></div>
 <!-- Stars -->
 <div id="sprinkle-rain"></div>
 
@@ -206,6 +206,8 @@
 
   <!-- Scripts -->
 <script>
+  
+  const IMAGES_PATH = "../images/";
 /***********************
  * HELPER: LOAD HTML PARTS
  ***********************/
@@ -740,9 +742,10 @@ function renderDebugInfo(tops, bottoms, colors, user){
  ***********************/
 document.addEventListener('DOMContentLoaded', async ()=>{
 
-  await loadHTML('./parts/formbottom.html','form-container');
-  await loadHTML('./parts/result.html','result-container');
-
+  // 1️⃣ Load form FIRST
+   await loadHTML("../components/sidebar.html", "sidebar-container");
+  await loadHTML("../components/forms/form.html", "form-container");
+  await loadHTML("../components/result.html", "result-container");
   document.querySelector('#outfit-form')
     ?.addEventListener('submit', handleBottomFormSubmit);
 
