@@ -4,10 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GLOWFIT</title>
-<link rel="icon" type="image/png" href="/images/logo glowfit.png">
+
+<link rel="icon" type="image/png" href="${BASE_PATH}images/logo glowfit.png">
+
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/sidebar.css">
+<link rel="stylesheet" href="${BASE_PATH}assets/css/sidebar.css">
 <style>
     :root {
       --tamarillo: #9e1814;
@@ -204,7 +206,10 @@
 </div>
 
   <!-- Scripts -->
-<script>
+<script  src="${BASE_PATH}assets/js/sidebar.js">
+  // Determine correct base path depending on folder
+const BASE_PATH = window.location.pathname.includes("/pages/") ? "../" : "";
+
 /***********************
  * HELPER: LOAD HTML PARTS
  ***********************/
@@ -633,7 +638,7 @@ function displayRuleResult(result){
       <div class="grid grid-cols-2 gap-4">
         ${items.map(i=>`
           <div class="outfit-card flex flex-col text-center h-full w-full">
-            <img src="/images/${type.toLowerCase()}s/${i.toLowerCase().replace(/\s/g,'_')}.jpg"
+            <img src="${BASE_PATH}images/${type.toLowerCase()}s/${i.toLowerCase().replace(/\s/g,'_')}.jpg"
                  class="w-full max-h-40 object-contain rounded-xl mb-2">
             <p class="text-sm font-medium mt-auto">${i}</p>
           </div>
