@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GLOWFIT</title>
 <link rel="icon" type="image/png" href="../images/logo glowfit.png">
-<link rel="stylesheet" href="../assets/css/sidebar.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/sidebar.css">
@@ -148,7 +147,7 @@
 
 <body class="h-full bg-pattern">
 
-
+<div id="sidebar"></div>
 <!-- Stars -->
 <div id="sprinkle-rain"></div>
 
@@ -199,9 +198,9 @@
 
 
         <!-- RESULTS -->
-        <div id="result-container"class="w-full flex flex-col
-            px-6   <!-- horizontal padding left/right -->
-            overflow-y-auto hidden opacity-0
+        <div id="result-container"
+     class="w-full flex flex-col px-6 overflow-y-auto hidden opacity-0 transition-opacity duration-500">
+
             transition-opacity duration-500">
           <div id="color-swatches" class="grid grid-cols-2 gap-1 w-full"></div>
           <div id="combinations-list" class="w-full mt-6"></div>
