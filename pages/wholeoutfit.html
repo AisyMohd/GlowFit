@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GLOWFIT</title>
-<link rel="icon" type="image/png" href="logo glowfit.png">
+<link rel="icon" type="image/png" href="../images/logo glowfit.png">
+<link rel="stylesheet" href="../assets/css/sidebar.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/sidebar.css">
@@ -238,8 +239,7 @@
 
   <!-- Scripts -->
 <script>
- const PARTS_PATH = "./pages/";     // relative to index.html
-const IMAGES_PATH = "images/";   // relative to index.html
+const IMAGES_PATH = "../images/";
 /***********************
  * HELPER: LOAD HTML PARTS
  ***********************/
@@ -840,32 +840,32 @@ function renderDebugInfo(tops, bottoms, colors, userInput){
 /***********************
  * MAIN INIT
  ***********************/
-document.addEventListener('DOMContentLoaded', async ()=>{
-await loadHTML(`${PARTS_PATH}parts/form.html`, 'form-container');
-await loadHTML(`${PARTS_PATH}parts/result.html`, 'result-container');
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load sidebar
+  await loadHTML("../components/sidebar.html", "sidebar");
 
-
+  // Load form + result
+  await loadHTML("../components/forms/form.html", "form-container");
+  await loadHTML("../components/result.html", "result-container");
 
   const form = document.querySelector('#outfit-form');
-  if(form) form.addEventListener('submit', handleFormSubmit);
-
+  if (form) form.addEventListener('submit', handleFormSubmit);
 
   const pickBtn = document.querySelector('#pick-other-btn');
-  if(pickBtn) pickBtn.addEventListener('click', pickOtherCombination);
-   const eventSelect = document.getElementById("event-type");
-  if(eventSelect){
+  if (pickBtn) pickBtn.addEventListener('click', pickOtherCombination);
+
+  const eventSelect = document.getElementById("event-type");
+  if (eventSelect) {
     eventSelect.addEventListener("change", e => {
       updateThemeOptionsByEvent(e.target.value);
     });
   }
 
-
-
-
   initStarRain();
 });
+
 </script>
-<script src="sidebar.js"></script>
+<script src="../assets/js/sidebar.js"></script>
 
 </body>
 </html>
