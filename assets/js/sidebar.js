@@ -1,114 +1,30 @@
-document.addEventListener('DOMContentLoaded', () => { 
 const defaultConfig = {
-    sidebar_title: "Navigation",
-    menu_item_1: "Dashboard",
-    menu_item_2: "Projects",
-    menu_item_3: "Team",
-    background_color: "#765036",
-    text_color: "#d1c5b1",
-    accent_color: "#907a65",
-    main_bg_color: "#2c1810",
-    font_size: 18
+  sidebar_title: "Navigation",
+  menu_item_1: "Dashboard",
+  menu_item_2: "Projects",
+  menu_item_3: "Team",
+  background_color: "#765036",
+  text_color: "#d1c5b1",
+  accent_color: "#907a65",
+  main_bg_color: "#2c1810",
+  font_size: 18
 };
 
-// Element SDK integration
-async function onConfigChange(config) {
-    const sidebarTitle = document.getElementById('sidebarTitle');
-    const menuItem1 = document.getElementById('menuItem1');
-    const menuItem2 = document.getElementById('menuItem2');
-    const menuItem3 = document.getElementById('menuItem3');
-
-    sidebarTitle.textContent = config.sidebar_title || defaultConfig.sidebar_title;
-    menuItem1.textContent = config.menu_item_1 || defaultConfig.menu_item_1;
-    menuItem2.textContent = config.menu_item_2 || defaultConfig.menu_item_2;
-    menuItem3.textContent = config.menu_item_3 || defaultConfig.menu_item_3;
-
-    // Apply colors
-    const bgColor = config.background_color || defaultConfig.background_color;
-    const textColor = config.text_color || defaultConfig.text_color;
-    const accentColor = config.accent_color || defaultConfig.accent_color;
-    const mainBgColor = config.main_bg_color || defaultConfig.main_bg_color;
-
-    sidebar.style.background = bgColor;
-    toggleBtn.style.background = bgColor;
-    document.querySelectorAll('.sidebar-title, .menu-link, .close-btn svg').forEach(el => {
-      if (el.tagName === 'svg') {
-        el.style.stroke = textColor;
-      } else {
-        el.style.color = textColor;
-      }
-    });
-
-    // Apply font size
-    const baseSize = config.font_size || defaultConfig.font_size;
-    sidebarTitle.style.fontSize = `${baseSize * 1.78}px`;
-    document.querySelectorAll('.menu-link').forEach(el => {
-      el.style.fontSize = `${baseSize}px`;
-    });
-    document.querySelector('.content-title').style.fontSize = `${baseSize * 2.67}px`;
-    document.querySelectorAll('.content-text').forEach(el => {
-      el.style.fontSize = `${baseSize}px`;
-    });
-}
-
-function mapToCapabilities(config) {
-    return {
-        recolorables: [
-        {
-            get: () => config.background_color || defaultConfig.background_color,
-            set: (value) => {
-            config.background_color = value;
-            window.elementSdk.setConfig({ background_color: value });
-            }
-        },
-        {
-            get: () => config.text_color || defaultConfig.text_color,
-            set: (value) => {
-            config.text_color = value;
-            window.elementSdk.setConfig({ text_color: value });
-            }
-        },
-        {
-            get: () => config.accent_color || defaultConfig.accent_color,
-            set: (value) => {
-            config.accent_color = value;
-            window.elementSdk.setConfig({ accent_color: value });
-            }
-        },
-        {
-            get: () => config.main_bg_color || defaultConfig.main_bg_color,
-            set: (value) => {
-            config.main_bg_color = value;
-            window.elementSdk.setConfig({ main_bg_color: value });
-            }
-        }
-        ],
-        borderables: [],
-        fontEditable: {
-        get: () => config.font_family || 'Playfair Display',
-        set: (value) => {
-            config.font_family = value;
-            window.elementSdk.setConfig({ font_family: value });
-            document.body.style.fontFamily = `${value}, serif`;
-        }
-        },
-        fontSizeable: {
-        get: () => config.font_size || defaultConfig.font_size,
-        set: (value) => {
-            config.font_size = value;
-            window.elementSdk.setConfig({ font_size: value });
-        }
-        }
-    };
-}
-
-function mapToEditPanelValues(config) {
-    return new Map([
-        ["sidebar_title", config.sidebar_title || defaultConfig.sidebar_title],
-        ["menu_item_1", config.menu_item_1 || defaultConfig.menu_item_1],
-        ["menu_item_2", config.menu_item_2 || defaultConfig.menu_item_2],
-        ["menu_item_3", config.menu_item_3 || defaultConfig.menu_item_3]
-    ]);
+// LOAD HTML helper
+async function loadHTML(url, containerId){
+  try {
+    const res = await fetch(url);
+    const html = await res.text();
+    const container = document.getElementById(containerId);
+    if(container){
+      container.innerHTML = html;
+      return container;
+    }
+    return null;
+  } catch(err){
+    console.error(`Failed to load ${url}:`, err);
+    return null;
+  }
 }
 
 function initSidebar() {
@@ -136,35 +52,42 @@ function initSidebar() {
   sidebar.addEventListener('click', e => e.stopPropagation());
 }
 
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load sidebar first
+  const sidebarLoaded = await loadHTML("../components/sidebar.html", "sidebar-container");
+  if(sidebarLoaded) initSidebar(); // attach events after HTML exists
+});
 
-if (window.elementSdk) {
-    window.elementSdk.init({
-      defaultConfig,
-      onConfigChange,
-      mapToCapabilities,
-      mapToEditPanelValues
-    });
-  }
-  //end sidebar code
+// Element SDK
+function onConfigChange(config){
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const sidebarTitle = document.getElementById('sidebarTitle');
+  const menuItem1 = document.getElementById('menuItem1');
+  const menuItem2 = document.getElementById('menuItem2');
+  const menuItem3 = document.getElementById('menuItem3');
 
-   fetch('../components/sidebar.html')
-  .then(res => res.text())
-  .then(html => {
-    document
-      .getElementById('app-wrapper')
-      .insertAdjacentHTML('afterbegin', html); 
+  if(!sidebar || !toggleBtn) return;
 
-    document.querySelectorAll('.menu-link').forEach(link => {
-      link.addEventListener('click', () => {
-        document.querySelectorAll('.menu-link')
-          .forEach(l => l.classList.remove('active'));
+  sidebarTitle.textContent = config.sidebar_title || defaultConfig.sidebar_title;
+  menuItem1.textContent = config.menu_item_1 || defaultConfig.menu_item_1;
+  menuItem2.textContent = config.menu_item_2 || defaultConfig.menu_item_2;
+  menuItem3.textContent = config.menu_item_3 || defaultConfig.menu_item_3;
 
-        link.classList.add('active');
-      });
-    });
+  const bgColor = config.background_color || defaultConfig.background_color;
+  const textColor = config.text_color || defaultConfig.text_color;
 
-    initSidebar(); // ✅ NOW elements exist
-    //new code which add sidebar
+  sidebar.style.background = bgColor;
+  toggleBtn.style.background = bgColor;
+  document.querySelectorAll('.sidebar-title, .menu-link, .close-btn svg').forEach(el=>{
+    if(el.tagName==='svg') el.style.stroke = textColor;
+    else el.style.color = textColor;
   });
+}
 
+if(window.elementSdk){
+  window.elementSdk.init({
+    defaultConfig,
+    onConfigChange
   });
+}
