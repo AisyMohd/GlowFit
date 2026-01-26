@@ -620,30 +620,31 @@ function displayBottomResult(result){
     </div>
   `).join('');
 
-  combos.innerHTML = `
-    <div class="mb-6">
-      <h4 class="font-semibold text-center mb-3">Your Top</h4>
-      <div class="flex justify-center">
-        <div class="outfit-card flex flex-col text-center h-full w-1/2">
-          <img src="/images/tops/${result.tops[0].toLowerCase().replace(/\s/g,'_')}.jpg"
+combos.innerHTML = `
+  <div class="mb-6">
+    <h4 class="font-semibold text-center mb-3">Your Top</h4>
+    <div class="flex justify-center">
+      <div class="outfit-card flex flex-col text-center h-full w-1/2">
+        <img src="${IMAGES_PATH}tops/${result.tops[0].toLowerCase().replace(/\s/g,'_')}.jpg"
+             class="w-full max-h-40 object-contain rounded-xl mb-2">
+        <p class="text-sm font-medium mt-auto">${result.tops[0]}</p>
+      </div>
+    </div>
+  </div>
+  <div class="mb-6">
+    <h4 class="font-semibold text-center mb-3">Recommended Bottoms</h4>
+    <div class="grid grid-cols-2 gap-4">
+      ${result.bottoms.map(b=>`
+        <div class="outfit-card flex flex-col text-center h-full w-full">
+          <img src="${IMAGES_PATH}bottoms/${b.toLowerCase().replace(/\s/g,'_')}.jpg"
                class="w-full max-h-40 object-contain rounded-xl mb-2">
-          <p class="text-sm font-medium mt-auto">${result.tops[0]}</p>
+          <p class="text-sm font-medium mt-auto">${b}</p>
         </div>
-      </div>
+      `).join('')}
     </div>
-    <div class="mb-6">
-      <h4 class="font-semibold text-center mb-3">Recommended Bottoms</h4>
-      <div class="grid grid-cols-2 gap-4">
-        ${result.bottoms.map(b=>`
-          <div class="outfit-card flex flex-col text-center h-full w-full">
-            <img src="/images/bottoms/${b.toLowerCase().replace(/\s/g,'_')}.jpg"
-                 class="w-full max-h-40 object-contain rounded-xl mb-2">
-            <p class="text-sm font-medium mt-auto">${b}</p>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
+  </div>
+`;
+
   resultsSection.classList.remove('hidden','opacity-0');
   resultsSection.classList.add('opacity-100');
 }
