@@ -740,30 +740,40 @@ function renderDebugInfo(tops, bottoms, colors, user){
 /***********************
  * MAIN INIT
  ***********************/
-document.addEventListener('DOMContentLoaded', async ()=>{
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1️⃣ Load form HTML
+  const formContainer = await loadHTML("/GlowFit/components/forms/formbottom.html", "form-container");
+  const resultContainer = await loadHTML("/GlowFit/components/result.html", "result-container");
 
-  // 1️⃣ Load form FIRST
-  await loadHTML("../components/forms/formbottom.html", "form-container");
-  await loadHTML("../components/result.html", "result-container");
-  document.querySelector('#outfit-form')
-    ?.addEventListener('submit', handleBottomFormSubmit);
+  // 2️⃣ Attach submit listener only if form exists
+  const form = formContainer?.querySelector('#outfit-form');
+  if (form) {
+    form.addEventListener('submit', handleBottomFormSubmit);
+  } else {
+    console.error("Form not found! Check path or ID.");
+  }
 
-  document.querySelector('#pick-other-btn')
-    ?.addEventListener('click', pickOtherCombination);
+  // 3️⃣ Attach listener for "Pick Other Combination" button
+  const pickBtn = resultContainer?.querySelector('#pick-other-btn');
+  if (pickBtn) {
+    pickBtn.addEventListener('click', pickOtherCombination);
+  }
 
-  const eventSelect = document.getElementById("event-type");
-
-  if(eventSelect){
-    eventSelect.addEventListener("change", e => {
+  // 4️⃣ Event → Theme dependency
+  const eventSelect = formContainer?.querySelector("#event-type");
+  if (eventSelect) {
+    eventSelect.addEventListener("change", (e) => {
       updateThemeOptionsByEvent(e.target.value);
     });
 
-    // ✅ apply once on load
+    // Apply theme filter on page load
     updateThemeOptionsByEvent(eventSelect.value);
   }
 
+  // 5️⃣ Start background star rain
   initStarRain();
 });
+
 </script>
 
 
