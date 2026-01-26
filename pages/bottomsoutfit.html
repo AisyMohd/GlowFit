@@ -743,8 +743,7 @@ function renderDebugInfo(tops, bottoms, colors, user){
 document.addEventListener('DOMContentLoaded', async ()=>{
 
   // 1️⃣ Load form FIRST
-   await loadHTML("../components/sidebar.html", "sidebar-container");
-  await loadHTML("../components/forms/form.html", "form-container");
+  await loadHTML("../components/forms/formbottom.html", "form-container");
   await loadHTML("../components/result.html", "result-container");
   document.querySelector('#outfit-form')
     ?.addEventListener('submit', handleBottomFormSubmit);
@@ -768,7 +767,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 </script>
 
 
-<script src="/assets/js/sidebar.js"></script>
+<script src="../assets/js/sidebar.js"></script>
 
 
 </body>
